@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tree-matching-csharp", "tre
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tree-matching-csharp.Test", "tree-matching-csharp.Test\tree-matching-csharp.Test.csproj", "{037B267E-2F70-4EFA-82B3-8C21F8233FDE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indexing", "Indexing\Indexing.csproj", "{3C1A2512-B89A-48B8-BE5A-3939A11EC210}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{037B267E-2F70-4EFA-82B3-8C21F8233FDE}.Release|x64.Build.0 = Release|Any CPU
 		{037B267E-2F70-4EFA-82B3-8C21F8233FDE}.Release|x86.ActiveCfg = Release|Any CPU
 		{037B267E-2F70-4EFA-82B3-8C21F8233FDE}.Release|x86.Build.0 = Release|Any CPU
+		{3C1A2512-B89A-48B8-BE5A-3939A11EC210}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C1A2512-B89A-48B8-BE5A-3939A11EC210}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C1A2512-B89A-48B8-BE5A-3939A11EC210}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3C1A2512-B89A-48B8-BE5A-3939A11EC210}.Debug|x64.Build.0 = Debug|Any CPU
+		{3C1A2512-B89A-48B8-BE5A-3939A11EC210}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3C1A2512-B89A-48B8-BE5A-3939A11EC210}.Debug|x86.Build.0 = Debug|Any CPU
+		{3C1A2512-B89A-48B8-BE5A-3939A11EC210}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C1A2512-B89A-48B8-BE5A-3939A11EC210}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C1A2512-B89A-48B8-BE5A-3939A11EC210}.Release|x64.ActiveCfg = Release|Any CPU
+		{3C1A2512-B89A-48B8-BE5A-3939A11EC210}.Release|x64.Build.0 = Release|Any CPU
+		{3C1A2512-B89A-48B8-BE5A-3939A11EC210}.Release|x86.ActiveCfg = Release|Any CPU
+		{3C1A2512-B89A-48B8-BE5A-3939A11EC210}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

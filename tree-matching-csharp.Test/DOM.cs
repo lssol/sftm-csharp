@@ -6,7 +6,7 @@ namespace tree_matching_csharp.Test
 {
     public class DomTests
     {
-        private const string SimpleWebpage = @"
+        public static string SimpleWebpage = @"
             <html>
                 <head></head>
                 <body>
