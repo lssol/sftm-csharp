@@ -36,7 +36,7 @@ namespace tree_matching_csharp
                 .Map<Node>(m => m
                     .Properties(ps => ps
                         .Text(s => s.Name(n => n.Value))
-                        .Text(s => s.Name(n => n.XPath))
+                        .Keyword(s => s.Name(n => n.XPath))
                     )
                 )
             );
@@ -51,12 +51,7 @@ namespace tree_matching_csharp
             );
         }
 
-        public class IndexerResult
-        {
-            public double? Score { get; set; }
-            public Node Node { get; set; }
-        }
-        public async Task<Dictionary<Node, HashSet<IndexerResult>>> FindNeighbors(
+        public async Task<Neighbors> FindNeighbors(
             IEnumerable<Node> sourceNodes, IEnumerable<Node> targetNodes)
         {
             IMultiSearchRequest CreateSearch(MultiSearchDescriptor ms)
@@ -69,7 +64,7 @@ namespace tree_matching_csharp
                             .Match(m => m.Field(n => n.Value).Query(node.Value))
                         )
                         .Query(q => q
-                            .Match(m => m.Field(n => n.XPath).Query(node.XPath))
+                            .Term(m => m.Field(n => n.XPath).Value(node.XPath))
                         )
                     );
                 }
@@ -78,17 +73,17 @@ namespace tree_matching_csharp
             }
 
             await BuildIndex(sourceNodes);
-            var response = await _client.MultiSearchAsync(IndexName, CreateSearch);
-
+            var response              = await _client.MultiSearchAsync(IndexName, CreateSearch);
             var sourceNodesDictionary = sourceNodes.ToDictionary(n => n.Id);
-            var neighbors             = new Dictionary<Node, HashSet<IndexerResult>>();
+            var neighbors             = new Neighbors();
+            
             foreach (var targetNode in targetNodes)
             {
                 var sourceNodesMatched = response.GetResponse<Node>(targetNode.Id.ToString())
                     ?.Hits
-                    ?.Select(hit => new IndexerResult {Score = hit.Score, Node = sourceNodesDictionary[hit.Source.Id]});
+                    ?.Select(hit => new Scored<Node>(sourceNodesDictionary[hit.Source.Id], hit.Score));
                 if (sourceNodesMatched != null)
-                    neighbors.Add(targetNode, new HashSet<IndexerResult>(sourceNodesMatched));
+                    neighbors.Add(targetNode, new HashSet<Scored<Node>>(sourceNodesMatched));
             }
 
             return neighbors;
