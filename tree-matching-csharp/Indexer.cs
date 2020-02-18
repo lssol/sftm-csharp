@@ -51,7 +51,12 @@ namespace tree_matching_csharp
             );
         }
 
-        public async Task<Dictionary<Node, HashSet<Node>>> FindNeighbors(
+        public class IndexerResult
+        {
+            public double? Score { get; set; }
+            public Node Node { get; set; }
+        }
+        public async Task<Dictionary<Node, HashSet<IndexerResult>>> FindNeighbors(
             IEnumerable<Node> sourceNodes, IEnumerable<Node> targetNodes)
         {
             IMultiSearchRequest CreateSearch(MultiSearchDescriptor ms)
@@ -76,15 +81,14 @@ namespace tree_matching_csharp
             var response = await _client.MultiSearchAsync(IndexName, CreateSearch);
 
             var sourceNodesDictionary = sourceNodes.ToDictionary(n => n.Id);
-            var neighbors             = new Dictionary<Node, HashSet<Node>>();
+            var neighbors             = new Dictionary<Node, HashSet<IndexerResult>>();
             foreach (var targetNode in targetNodes)
             {
                 var sourceNodesMatched = response.GetResponse<Node>(targetNode.Id.ToString())
-                    ?.Documents
-                    ?.Select(n => n.Id)
-                    ?.Select(id => sourceNodesDictionary[id]);
+                    ?.Hits
+                    ?.Select(hit => new IndexerResult {Score = hit.Score, Node = sourceNodesDictionary[hit.Source.Id]});
                 if (sourceNodesMatched != null)
-                    neighbors.Add(targetNode, new HashSet<Node>(sourceNodesMatched));
+                    neighbors.Add(targetNode, new HashSet<IndexerResult>(sourceNodesMatched));
             }
 
             return neighbors;

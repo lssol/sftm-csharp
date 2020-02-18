@@ -17,4 +17,10 @@
       <ProjectReference Include="..\tree-matching-csharp\tree-matching-csharp.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="youtube.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

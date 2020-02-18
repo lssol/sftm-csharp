@@ -26,7 +26,7 @@ namespace tree_matching_csharp
     public class Tree
     {
         public readonly IList Edges;
-        public readonly IList Nodes;
+        public readonly IList<Node> Nodes;
         public Tree()
         {
             Edges = new List<Edge>();

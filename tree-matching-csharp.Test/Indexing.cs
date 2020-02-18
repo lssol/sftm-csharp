@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -33,15 +34,32 @@ namespace tree_matching_csharp.Test
             if (neighbors.Count == 0)
                 Assert.Fail();
             
-            var exampleSource = sourceNodes[0];
-            if (!neighbors[exampleSource].Contains(targetNodes[0]))
+            var exampleTarget = targetNodes[0];
+            var nodesAssociated = new HashSet<Node>(neighbors[exampleTarget].Select(n => n.Node));
+            if (!nodesAssociated.Contains(sourceNodes[0]))
                 Assert.Fail();
         }
 
         [Test]
-        void FindNeighborsForFakeWebsite()
+        public async Task FindNeighborsForFakeWebsite()
         {
-//            DomTests.SimpleWebpage
+            var webpage = DomTests.SimpleWebpage;
+            var tree = await DOM.WebpageToTree(webpage);
+            var indexer = new Indexer();
+            var neighbors = await indexer.FindNeighbors(tree.Nodes, tree.Nodes);
+            if (neighbors.Count == 0)
+                Assert.Fail();
+        }
+        [Test]
+        public async Task FindNeighborsForRealWebsite()
+        {
+            var webpage = File.ReadAllText("youtube.html");
+            var tree = await DOM.WebpageToTree(webpage);
+            var indexer = new Indexer();
+            var neighbors = await indexer.FindNeighbors(tree.Nodes, tree.Nodes);
+            if (neighbors.Count == 0)
+                Assert.Fail();
+            
         }
     }
 }
