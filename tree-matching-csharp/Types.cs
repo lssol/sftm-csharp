@@ -6,22 +6,20 @@ namespace tree_matching_csharp
 {
     public class Scored<T>
     {
-        public Scored(T value, double? score)
+        public Scored(T value, float? score)
         {
             Value = value;
             Score = score;
         }
 
         public T Value { get; set; }
-        public double? Score { get; set; }
+        public float? Score { get; set; }
     }
-    
-    public class Neighbors : Dictionary<Node, HashSet<Scored<Node>>> {}
     
     public class Edge
     {
-        public Node   Node1;
-        public Node   Node2;
+        public Node   Source;
+        public Node   Target;
         public float? Cost;
     }
 
@@ -32,10 +30,13 @@ namespace tree_matching_csharp
             Id = Guid.NewGuid();
         }
 
-        public Guid   Id { get; set; }
+        public Guid Id;
         public string Value;
         public string Signature;
         public string XPath;
+        public int SizeValue => Value.Length;
+        public int SizeXPath => XPath.Length;
+        public Node Parent;
     }
     public class Tree
     {
@@ -46,6 +47,10 @@ namespace tree_matching_csharp
             Edges = new List<Edge>();
             Nodes = new List<Node>();
         }
+    }
 
+    public class Parameters
+    {
+        public float[] WeightsPropagation { get; set; }
     }
 }

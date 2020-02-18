@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Nest;
+using Neighbors = System.Collections.Generic.Dictionary<tree_matching_csharp.Node, System.Collections.Generic.HashSet<tree_matching_csharp.Scored<tree_matching_csharp.Node>>>;
 
 namespace tree_matching_csharp
 {
@@ -12,9 +11,6 @@ namespace tree_matching_csharp
     {
         private const    string        IndexName = "wehave-node";
         private readonly ElasticClient _client;
-        private          Task          _deleting;
-
-        private Node[] _nodes;
 
         public Indexer()
         {
@@ -23,6 +19,8 @@ namespace tree_matching_csharp
 //                .EnableDebugMode()
                 .DefaultMappingFor<Node>(m => m
                     .IdProperty(n => n.Id)
+                    .Ignore(n => n.Parent)
+                    .Ignore(n => n.Signature)
                 );
             _client = new ElasticClient(settings);
         }
@@ -56,16 +54,21 @@ namespace tree_matching_csharp
         {
             IMultiSearchRequest CreateSearch(MultiSearchDescriptor ms)
             {
+                const float ratioLengthRange = 0.15f;
                 foreach (var node in targetNodes)
                 {
                     ms.Search<Node>(node.Id.ToString(), s => s
                         .Source(so => so.Includes(i => i.Field(n => n.Id)))
                         .Query(q => q
-                            .Match(m => m.Field(n => n.Value).Query(node.Value))
-                        )
-                        .Query(q => q
-                            .Term(m => m.Field(n => n.XPath).Value(node.XPath))
-                        )
+                            .Match(m => m.Field(n => n.Value).Query(node.Value)) || q
+                            .Term(m => m.Field(n => n.XPath).Value(node.XPath)) || q
+                            .Range(m => m.Field(n => n.SizeValue)
+                                .GreaterThanOrEquals(node.SizeValue - ratioLengthRange * node.SizeValue)
+                                .LessThanOrEquals(node.SizeValue + ratioLengthRange * node.SizeValue)) || q
+                            .Range(m => m.Field(n => n.SizeXPath)
+                                .GreaterThanOrEquals(node.SizeXPath - ratioLengthRange * node.SizeXPath)
+                                .LessThanOrEquals(node.SizeXPath + ratioLengthRange * node.SizeXPath)
+                        ))
                     );
                 }
 
@@ -81,7 +84,7 @@ namespace tree_matching_csharp
             {
                 var sourceNodesMatched = response.GetResponse<Node>(targetNode.Id.ToString())
                     ?.Hits
-                    ?.Select(hit => new Scored<Node>(sourceNodesDictionary[hit.Source.Id], hit.Score));
+                    ?.Select(hit => new Scored<Node>(sourceNodesDictionary[hit.Source.Id], (float?) hit.Score));
                 if (sourceNodesMatched != null)
                     neighbors.Add(targetNode, new HashSet<Scored<Node>>(sourceNodesMatched));
             }

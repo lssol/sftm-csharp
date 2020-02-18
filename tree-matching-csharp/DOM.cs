@@ -49,7 +49,8 @@ namespace tree_matching_csharp
                 {
                     Value = StringifyNode(el), 
                     Signature = el.Attributes.GetNamedItem(AttributeName)?.Value,
-                    XPath = newXPath
+                    XPath = newXPath,
+                    Parent = parentNode
                 };
                 tree.Nodes.Add(node);
                 
@@ -57,8 +58,8 @@ namespace tree_matching_csharp
                     tree.Edges.Add(new Edge
                     {
                         Cost  = null,
-                        Node1 = parentNode, 
-                        Node2 = node
+                        Source = parentNode, 
+                        Target = node
                     });
                 
                 foreach (var child in el.Children)

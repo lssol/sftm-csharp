@@ -28,8 +28,8 @@ namespace tree_matching_csharp.Test
                 "node",
                 "fox"
             };
-            var sourceNodes = sourceList.Select(s => new Node { Value = s }).ToArray();
-            var targetNodes = targetList.Select(s => new Node { Value = s }).ToArray();
+            var sourceNodes = sourceList.Select(s => new Node { Value = s, XPath = s}).ToArray();
+            var targetNodes = targetList.Select(s => new Node { Value = s, XPath = s}).ToArray();
             
             var indexer = new Indexer();
             var neighbors = await indexer.FindNeighbors(sourceNodes, targetNodes);
@@ -81,6 +81,7 @@ namespace tree_matching_csharp.Test
                 if (target != bestMatch)
                     mistakes++;
             }
+            Console.WriteLine($"Mistakes: {mistakes} / {tree.Nodes.Count}");
             
             if (mistakes > 0.9*tree.Nodes.Count)
                 Assert.Fail();
