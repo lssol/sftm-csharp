@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
@@ -42,11 +44,19 @@ namespace tree_matching_csharp
 
         private async Task BuildIndex(IEnumerable<Node> nodes)
         {
+            var watch = new Stopwatch();
+            watch.Restart();
             await CreateIndexIfNotExist();
+            watch.Stop();
+            Console.WriteLine($"Creating the index took {watch.ElapsedMilliseconds}");
+
+            watch.Restart();
             await _client.BulkAsync(b => b
                 .Refresh(Refresh.True)
                 .IndexMany(nodes)
             );
+            watch.Stop();
+            Console.WriteLine($"Loading the data into els took {watch.ElapsedMilliseconds}");
         }
 
         public async Task<Neighbors> FindNeighbors(
@@ -60,15 +70,15 @@ namespace tree_matching_csharp
                     ms.Search<Node>(node.Id.ToString(), s => s
                         .Source(so => so.Includes(i => i.Field(n => n.Id)))
                         .Query(q => q
-                            .Match(m => m.Field(n => n.Value).Query(node.Value)) || q
-                            .Term(m => m.Field(n => n.XPath).Value(node.XPath)) || q
-                            .Range(m => m.Field(n => n.SizeValue)
-                                .GreaterThanOrEquals(node.SizeValue - ratioLengthRange * node.SizeValue)
-                                .LessThanOrEquals(node.SizeValue + ratioLengthRange * node.SizeValue)) || q
-                            .Range(m => m.Field(n => n.SizeXPath)
-                                .GreaterThanOrEquals(node.SizeXPath - ratioLengthRange * node.SizeXPath)
-                                .LessThanOrEquals(node.SizeXPath + ratioLengthRange * node.SizeXPath)
-                        ))
+                                        .Match(m => m.Field(n => n.Value).Query(node.Value)) || q
+                                        .Term(m => m.Field(n => n.XPath).Value(node.XPath))  || q
+                                        .Range(m => m.Field(n => n.SizeValue)
+                                            .GreaterThanOrEquals(node.SizeValue - ratioLengthRange * node.SizeValue)
+                                            .LessThanOrEquals(node.SizeValue    + ratioLengthRange * node.SizeValue)) || q
+                                        .Range(m => m.Field(n => n.SizeXPath)
+                                            .GreaterThanOrEquals(node.SizeXPath - ratioLengthRange * node.SizeXPath)
+                                            .LessThanOrEquals(node.SizeXPath    + ratioLengthRange * node.SizeXPath)
+                                        ))
                     );
                 }
 
@@ -76,10 +86,15 @@ namespace tree_matching_csharp
             }
 
             await BuildIndex(sourceNodes);
-            var response              = await _client.MultiSearchAsync(IndexName, CreateSearch);
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Restart();
+            var response = await _client.MultiSearchAsync(IndexName, CreateSearch);
+            stopwatch.Stop();
+            Console.WriteLine($"The search took {stopwatch.ElapsedMilliseconds} while els says it took: {response.Took}");
             var sourceNodesDictionary = sourceNodes.ToDictionary(n => n.Id);
             var neighbors             = new Neighbors();
-            
+
             foreach (var targetNode in targetNodes)
             {
                 var sourceNodesMatched = response.GetResponse<Node>(targetNode.Id.ToString())

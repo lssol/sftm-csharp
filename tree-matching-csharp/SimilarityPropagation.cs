@@ -9,21 +9,9 @@ namespace tree_matching_csharp
 {
     public static class SimilarityPropagation
     {
-        public static IEnumerable<Edge> NeighborsToEdges(Neighbors neighbors)
-        {
-            return neighbors.SelectMany(pair => pair
-                .Value
-                .Select(source => new Edge
-                {
-                    Cost   = source.Score,
-                    Source = source.Value,
-                    Target = pair.Key
-                }));
-        }
-
         public static Neighbors PropagateSimilarity(Neighbors neighbors, float[] propagationWeights)
         {
-            var edges    = NeighborsToEdges(neighbors);
+            var edges    = Utils.NeighborsToEdges(neighbors);
             var edgesDic = edges.ToDictionary(e => (e.Source, e.Target), e => e.Cost);
 
             float ComputePropagatedCost(Node source, Node target, float cost)

@@ -40,11 +40,9 @@ namespace tree_matching_csharp
     }
     public class Tree
     {
-        public readonly IList       Edges;
         public readonly IList<Node> Nodes;
         public Tree()
         {
-            Edges = new List<Edge>();
             Nodes = new List<Node>();
         }
     }

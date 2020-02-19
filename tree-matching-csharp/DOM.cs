@@ -54,13 +54,13 @@ namespace tree_matching_csharp
                 };
                 tree.Nodes.Add(node);
                 
-                if (parent != null)
-                    tree.Edges.Add(new Edge
-                    {
-                        Cost  = null,
-                        Source = parentNode, 
-                        Target = node
-                    });
+//                if (parent != null)
+//                    tree.Edges.Add(new Edge
+//                    {
+//                        Cost  = null,
+//                        Source = parentNode, 
+//                        Target = node
+//                    });
                 
                 foreach (var child in el.Children)
                     Copy(child, el, node, newXPath);
