@@ -37,6 +37,7 @@ namespace tree_matching_csharp
         public int SizeValue => Value.Length;
         public int SizeXPath => XPath.Length;
         public Node Parent;
+        public bool IsNoMatch;
     }
 
     public class TreeMatchingOutput

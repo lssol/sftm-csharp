@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Neighbors = System.Collections.Generic.Dictionary<tree_matching_csharp.Node, System.Collections.Generic.HashSet<tree_matching_csharp.Scored<tree_matching_csharp.Node>>>;
@@ -30,6 +31,24 @@ namespace tree_matching_csharp
                     Source = source.Value,
                     Target = pair.Key
                 }));
+        }
+
+        public static Dictionary<T, HashSet<G>> PushAt<T, G>(this Dictionary<T, HashSet<G>> self, T key, G value)
+        {
+            if (self.ContainsKey(key))
+                self[key].Add(value);
+            else
+                self.Add(key, new HashSet<G>{value});
+
+            return self;
+        }
+
+        public static LinkedList<T> RemoveIfExist<T>(this LinkedList<T> self, LinkedListNode<T> node)
+        {
+            if (node.List != null)
+                self.Remove(node);
+            
+            return self;
         }
     }
 }

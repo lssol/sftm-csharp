@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using MoreLinq;
 
 namespace tree_matching_csharp
@@ -10,7 +12,6 @@ namespace tree_matching_csharp
     {
         public class Parameters
         {
-            public float NoMatchCost  { get; set; }
             public float Gamma        { get; set; }
             public float Lambda       { get; set; }
             public int   NbIterations { get; set; }
@@ -26,9 +27,10 @@ namespace tree_matching_csharp
         {
             _params      = parameters;
             _nbNodes     = nbNodes;
-            _edges       = edges.OrderByDescending(e => e.Cost);
+            _edges       = edges.OrderByDescending(e => e.Cost).ToList(); // Without the ToList(), the edges.foreach(e => ...) changes the reference of e
             _nodeToEdges = ComputeNodeToEdgesDic();
-            _rand        = new Random();
+
+            _rand = new Random();
         }
 
         public List<Edge> Run()
@@ -60,13 +62,12 @@ namespace tree_matching_csharp
             var nodeToEdges = new Dictionary<Node, HashSet<Edge>>(_nbNodes + 10);
             _edges.ForEach(e =>
             {
-                if (nodeToEdges.ContainsKey(e.Source))
-                    nodeToEdges[e.Source].Add(e);
-                if (nodeToEdges.ContainsKey(e.Target))
-                    nodeToEdges[e.Target].Add(e);
-
-                nodeToEdges.Add(e.Source, new HashSet<Edge> {e});
-                nodeToEdges.Add(e.Target, new HashSet<Edge> {e});
+                if (e.Source == null)
+                    nodeToEdges.PushAt(e.Target, e);
+                else if (e.Target == null)
+                    nodeToEdges.PushAt(e.Source, e);
+                else
+                    nodeToEdges.PushAt(e.Source, e).PushAt(e.Target, e);
             });
 
             return nodeToEdges;
@@ -74,7 +75,7 @@ namespace tree_matching_csharp
 
         private HashSet<Edge> GetAdjacentEdges(Edge edge)
         {
-            var result = new HashSet<Edge>(_nodeToEdges[edge.Source].Count + _nodeToEdges[edge.Target].Count + 10);
+            var result = new HashSet<Edge>();
             if (edge.Source != null)
                 result.UnionWith(_nodeToEdges[edge.Source]);
             if (edge.Target != null)
@@ -101,7 +102,8 @@ namespace tree_matching_csharp
             void KeepEdge(Edge edge)
             {
                 newMatching.Add(edge);
-                GetAdjacentEdges(edge).ForEach(e => edges.Remove(edgesDic[e]));
+                GetAdjacentEdges(edge).ForEach(e => edges.RemoveIfExist(edgesDic[e]));
+                edges.RemoveIfExist(edgesDic[edge]);
             }
 
             var p = _rand.Next(0, previousMatching.Count);
