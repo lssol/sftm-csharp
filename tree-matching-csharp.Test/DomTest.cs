@@ -27,9 +27,8 @@ namespace tree_matching_csharp.Test
         [Test]
         public async Task WebpageToTree()
         {
-            var tree = await DOM.WebpageToTree(SimpleWebpage);
-            Assert.AreEqual(tree.Edges.Count, 4);
-            Assert.AreEqual(tree.Nodes.Count, 5);
+            var nodes = await DOM.WebpageToTree(SimpleWebpage);
+            Assert.AreEqual(nodes.Count(), 5);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace tree_matching_csharp
 {
     public class Metropolis
     {
-        public class Params
+        public class Parameters
         {
             public float NoMatchCost  { get; set; }
             public float Gamma        { get; set; }
@@ -17,21 +17,21 @@ namespace tree_matching_csharp
         }
 
         private readonly Dictionary<Node, HashSet<Edge>> _nodeToEdges;
-        private readonly Params                          _params;
+        private readonly Parameters                      _params;
         private readonly IEnumerable<Edge>               _edges;
         private readonly Random                          _rand;
         private readonly int                             _nbNodes;
 
-        public Metropolis(Params @params, IEnumerable<Edge> edges, int nbNodes)
+        public Metropolis(Parameters parameters, IEnumerable<Edge> edges, int nbNodes)
         {
-            _params      = @params;
+            _params      = parameters;
             _nbNodes     = nbNodes;
             _edges       = edges.OrderByDescending(e => e.Cost);
             _nodeToEdges = ComputeNodeToEdgesDic();
             _rand        = new Random();
         }
 
-        public List<Edge> MetropolisAlgorithm()
+        public List<Edge> Run()
         {
             var currentMatching  = SuggestMatching(new List<Edge>());
             var currentObjective = ComputeObjective(currentMatching);

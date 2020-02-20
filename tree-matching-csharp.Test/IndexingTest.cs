@@ -47,9 +47,9 @@ namespace tree_matching_csharp.Test
         public async Task FindNeighborsForFakeWebsite()
         {
             var webpage = DomTests.SimpleWebpage;
-            var tree = await DOM.WebpageToTree(webpage);
+            var nodes = await DOM.WebpageToTree(webpage);
             var indexer = new Indexer();
-            var neighbors = await indexer.FindNeighbors(tree.Nodes, tree.Nodes);
+            var neighbors = await indexer.FindNeighbors(nodes, nodes);
             if (neighbors.Count == 0)
                 Assert.Fail();
         }
@@ -61,14 +61,14 @@ namespace tree_matching_csharp.Test
             var webpage = File.ReadAllText("websites/google.html");
             
             stopwatch.Restart();
-            var tree = await DOM.WebpageToTree(webpage);
+            var nodes = await DOM.WebpageToTree(webpage);
             stopwatch.Stop();
             Console.WriteLine($"Webpage to tree took: {stopwatch.ElapsedMilliseconds}");
            
             var indexer = new Indexer();
 
             stopwatch.Restart();
-            var neighbors = await indexer.FindNeighbors(tree.Nodes, tree.Nodes);
+            var neighbors = await indexer.FindNeighbors(nodes, nodes);
             stopwatch.Stop();
             Console.WriteLine($"find neighbors took: {stopwatch.ElapsedMilliseconds}");
             
@@ -81,9 +81,9 @@ namespace tree_matching_csharp.Test
                 if (target != bestMatch)
                     mistakes++;
             }
-            Console.WriteLine($"Mistakes: {mistakes} / {tree.Nodes.Count}");
+            Console.WriteLine($"Mistakes: {mistakes} / {nodes.Count()}");
             
-            if (mistakes > 0.9*tree.Nodes.Count)
+            if (mistakes > 0.9 * nodes.Count())
                 Assert.Fail();
         }
     }

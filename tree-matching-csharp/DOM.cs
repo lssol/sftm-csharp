@@ -38,40 +38,32 @@ namespace tree_matching_csharp
             return partialXPath + $"/{el.TagName}" + brackets;
         }
 
-        public static Tree DomToTree(IDocument doc)
+        public static IEnumerable<Node> DomToTree(IDocument doc)
         {
-            var tree = new Tree();
+            var nodes = new List<Node>();
 
             void Copy(IElement el, IParentNode parent, Node parentNode, string partialXPath)
             {
                 var newXPath = GetNewXPath(el, parent, partialXPath);
                 var node = new Node
                 {
-                    Value = StringifyNode(el), 
+                    Value     = StringifyNode(el),
                     Signature = el.Attributes.GetNamedItem(AttributeName)?.Value,
-                    XPath = newXPath,
-                    Parent = parentNode
+                    XPath     = newXPath,
+                    Parent    = parentNode
                 };
-                tree.Nodes.Add(node);
-                
-//                if (parent != null)
-//                    tree.Edges.Add(new Edge
-//                    {
-//                        Cost  = null,
-//                        Source = parentNode, 
-//                        Target = node
-//                    });
-                
+                nodes.Add(node);
+
                 foreach (var child in el.Children)
                     Copy(child, el, node, newXPath);
             }
-            
+
             Copy(doc.Body, null, null, "");
-            
-            return tree;
+
+            return nodes;
         }
 
-        public static async Task<Tree> WebpageToTree(string source)
+        public static async Task<IEnumerable<Node>> WebpageToTree(string source)
         {
             var document = await WebpageToDocument(source);
 

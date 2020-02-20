@@ -23,13 +23,13 @@ namespace tree_matching_csharp.Test
             var mutant   = File.ReadAllText("websites/linkedin_mutant.html");
 
             stopWatch.Restart();
-            var originalTree = await DOM.WebpageToTree(original);
-            var mutantTree   = await DOM.WebpageToTree(mutant);
+            var originalNodes = await DOM.WebpageToTree(original);
+            var mutantNodes   = await DOM.WebpageToTree(mutant);
             stopWatch.Stop();
             Console.WriteLine($"Building Trees took: {stopWatch.ElapsedMilliseconds}");
 
-            var originalNodeToSignatureDic = originalTree.Nodes.ToDictionary(n => n, n => n.Signature);
-            var mutantNodeToSignatureDic   = mutantTree.Nodes.ToDictionary(n => n, n => n.Signature);
+            var originalNodeToSignatureDic = originalNodes.ToDictionary(n => n, n => n.Signature);
+            var mutantNodeToSignatureDic   = mutantNodes.ToDictionary(n => n, n => n.Signature);
 
             int ComputeAccuracy(Neighbors neighbors)
             {
@@ -45,7 +45,7 @@ namespace tree_matching_csharp.Test
             }
 
             stopWatch.Restart();
-            var neighbors = await indexer.FindNeighbors(originalTree.Nodes, mutantTree.Nodes);
+            var neighbors = await indexer.FindNeighbors(originalNodes, mutantNodes);
             stopWatch.Stop();
             Console.WriteLine($"Finding Neighbors took: {stopWatch.ElapsedMilliseconds}");
             
@@ -57,8 +57,8 @@ namespace tree_matching_csharp.Test
             var mistakesWithPropagation = ComputeAccuracy(neighbors);
             Console.WriteLine($"Propagating the similarity took: {stopWatch.ElapsedMilliseconds}");
             
-            Console.WriteLine($"Number of mistakes no propagation: {mistakesNoPropagation} / {mutantTree.Nodes.Count}");
-            Console.WriteLine($"Number of mistakes with propagation: {mistakesWithPropagation} / {mutantTree.Nodes.Count}");
+            Console.WriteLine($"Number of mistakes no propagation: {mistakesNoPropagation} / {mutantNodes.Count()}");
+            Console.WriteLine($"Number of mistakes with propagation: {mistakesWithPropagation} / {mutantNodes.Count()}");
         }
     }
 }

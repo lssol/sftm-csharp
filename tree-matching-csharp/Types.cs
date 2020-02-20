@@ -38,17 +38,9 @@ namespace tree_matching_csharp
         public int SizeXPath => XPath.Length;
         public Node Parent;
     }
-    public class Tree
-    {
-        public readonly IList<Node> Nodes;
-        public Tree()
-        {
-            Nodes = new List<Node>();
-        }
-    }
 
-    public class Parameters
+    public class TreeMatchingOutput
     {
-        public float[] WeightsPropagation { get; set; }
+        public Dictionary<string, string> Matching { get; set; }
     }
 }
