@@ -13,9 +13,11 @@ namespace tree_matching_csharp
     {
         private const    string        IndexName = "wehave-node";
         private readonly ElasticClient _client;
+        private readonly int _limitNeighbors;
 
-        public Indexer()
+        public Indexer(int limitNeighbors)
         {
+            _limitNeighbors = limitNeighbors;
             var settings = new ConnectionSettings()
                 .DefaultIndex(IndexName)
 //                .EnableDebugMode()
@@ -27,39 +29,56 @@ namespace tree_matching_csharp
             _client = new ElasticClient(settings);
         }
 
-        private async Task CreateIndexIfNotExist()
+        private void CreateIndexIfNotExist()
         {
+            var watch = new Stopwatch();
+            watch.Restart();
             if (_client.Indices.Exists(IndexName).Exists)
-                await _client.Indices.DeleteAsync(IndexName);
-
-            await _client.Indices.CreateAsync(IndexName, c => c
+                 _client.Indices.Delete(IndexName);
+            watch.Stop();
+            Console.WriteLine($"Deleting previous index took: {watch.ElapsedMilliseconds}");
+            
+            watch.Restart();
+             _client.Indices.Create(IndexName, c => c
+                .Settings(s => s
+                    .NumberOfShards(1)
+                    .NumberOfReplicas(0)
+                    .FileSystemStorageImplementation(FileSystemStorageImplementation.MMap)
+                    .Analysis(a => a.Analyzers(an => an.Whitespace("white")))
+                )
                 .Map<Node>(m => m
                     .Properties(ps => ps
-                        .Text(s => s.Name(n => n.Value))
+                        .Text(s => s.Name(n => n.Value).Analyzer("white"))
                         .Keyword(s => s.Name(n => n.XPath))
                     )
                 )
             );
+            
+            watch.Stop();
+            Console.WriteLine($"Creating the empty index took: {watch.ElapsedMilliseconds}");
         }
 
-        private async Task BuildIndex(IEnumerable<Node> nodes)
+        private void BuildIndex(IEnumerable<Node> nodes)
         {
             var watch = new Stopwatch();
             watch.Restart();
-            await CreateIndexIfNotExist();
+            CreateIndexIfNotExist();
             watch.Stop();
             Console.WriteLine($"Creating the index took {watch.ElapsedMilliseconds}");
 
             watch.Restart();
-            await _client.BulkAsync(b => b
-                .Refresh(Refresh.True)
+            _client.Bulk(b => b
                 .IndexMany(nodes)
+                .SourceEnabled(false)
+                .Pretty(false)
+                .ErrorTrace(false)
             );
             watch.Stop();
+            _client.Indices.Refresh(IndexName);
             Console.WriteLine($"Loading the data into els took {watch.ElapsedMilliseconds}");
         }
 
-        public async Task<Neighbors> FindNeighbors(
+        public Neighbors FindNeighbors(
             IEnumerable<Node> sourceNodes, IEnumerable<Node> targetNodes)
         {
             IMultiSearchRequest CreateSearch(MultiSearchDescriptor ms)
@@ -68,7 +87,11 @@ namespace tree_matching_csharp
                 foreach (var node in targetNodes)
                 {
                     ms.Search<Node>(node.Id.ToString(), s => s
+                        .Pretty(false)
+                        .Human(false)
+                        .ErrorTrace(false)
                         .Source(so => so.Includes(i => i.Field(n => n.Id)))
+                        .Size(_limitNeighbors)
                         .Query(q => q
                                         .Match(m => m.Field(n => n.Value).Query(node.Value)) || q
                                         .Term(m => m.Field(n => n.XPath).Value(node.XPath))  || q
@@ -85,11 +108,11 @@ namespace tree_matching_csharp
                 return ms;
             }
 
-            await BuildIndex(sourceNodes);
+            BuildIndex(sourceNodes);
 
             var stopwatch = new Stopwatch();
             stopwatch.Restart();
-            var response = await _client.MultiSearchAsync(IndexName, CreateSearch);
+            var response = _client.MultiSearch(IndexName, CreateSearch);
             stopwatch.Stop();
             Console.WriteLine($"The search took {stopwatch.ElapsedMilliseconds} while els says it took: {response.Took}");
             var sourceNodesDictionary = sourceNodes.ToDictionary(n => n.Id);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Common;
@@ -40,19 +41,29 @@ namespace tree_matching_csharp
 
         public async Task<IEnumerable<(string, string)>> MatchWebsites(string source, string target)
         {
-            var indexer     = new Indexer();
+            var watch = new Stopwatch();
+            var indexer = new Indexer(_param.LimitNeighbors);
+            
+            watch.Restart();
             var sourceNodes = await DOM.WebpageToTree(source);
             var targetNodes = await DOM.WebpageToTree(target);
+            watch.Stop();
+            Console.WriteLine($"Creating trees took: {watch.ElapsedMilliseconds}");
 
             if (!IsSignaturePresent(sourceNodes) || !IsSignaturePresent(targetNodes))
                 throw new Exception("The web documents are expected to contain signature attributes");
 
-            var neighbors = await indexer.FindNeighbors(sourceNodes, targetNodes);
+            var neighbors = indexer.FindNeighbors(sourceNodes, targetNodes);
             SimilarityPropagation.PropagateSimilarity(neighbors, _param.WeightsPropagation);
 
             var edges      = Utils.NeighborsToEdges(neighbors).Concat(GetNoMatchEdges(sourceNodes, targetNodes));
             var metropolis = new Metropolis(_param.MetropolisParameters, edges, sourceNodes.Count() + targetNodes.Count());
-            var matching   = metropolis.Run();
+            
+            watch.Restart();
+            var matching = metropolis.Run();
+            watch.Stop();
+            Console.WriteLine($"Metropolis took: {watch.ElapsedMilliseconds}");
+            
 
             var signaturesMatching = matching.Select(m => (m.Source?.Signature, m.Target?.Signature));
 

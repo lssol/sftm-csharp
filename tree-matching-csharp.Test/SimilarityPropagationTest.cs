@@ -16,7 +16,7 @@ namespace tree_matching_csharp.Test
         public async Task CheckThatSimilarityPropagationIsUseful()
         {
             var stopWatch = new Stopwatch();
-            var indexer = new Indexer();
+            var indexer = new Indexer(10);
             var weights = new[] {0.3f, 0.05f};
 
             var original = File.ReadAllText("websites/linkedin.html");
@@ -45,7 +45,7 @@ namespace tree_matching_csharp.Test
             }
 
             stopWatch.Restart();
-            var neighbors = await indexer.FindNeighbors(originalNodes, mutantNodes);
+            var neighbors = indexer.FindNeighbors(originalNodes, mutantNodes);
             stopWatch.Stop();
             Console.WriteLine($"Finding Neighbors took: {stopWatch.ElapsedMilliseconds}");
             
