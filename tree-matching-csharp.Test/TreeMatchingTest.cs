@@ -22,7 +22,7 @@ namespace tree_matching_csharp.Test
                     Gamma        = 0.7f,
                     Lambda       = 0.7f,
                     NbIterations = 100,
-                    InMemoryAdjacentEdges = true
+                    InMemoryAdjacentEdges = false
                 }
             });
 

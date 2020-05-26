@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MoreLinq.Extensions;
 using NUnit.Framework;
+using tree_matching_csharp.indexers;
 
 namespace tree_matching_csharp.Test
 {
@@ -28,10 +29,10 @@ namespace tree_matching_csharp.Test
                 "node",
                 "fox"
             };
-            var sourceNodes = sourceList.Select(s => new Node { Value = s, XPath = s}).ToArray();
-            var targetNodes = targetList.Select(s => new Node { Value = s, XPath = s}).ToArray();
+            var sourceNodes = sourceList.Select(s => new Node { Value = s.Split(" ")}).ToArray();
+            var targetNodes = targetList.Select(s => new Node { Value = s.Split(" ")}).ToArray();
             
-            var indexer = new Indexer(10);
+            var indexer = new InMemoryIndexer();
             var neighbors = indexer.FindNeighbors(sourceNodes, targetNodes);
             
             if (neighbors.Count == 0)
@@ -48,7 +49,7 @@ namespace tree_matching_csharp.Test
         {
             var webpage = DomTests.SimpleWebpage;
             var nodes = await DOM.WebpageToTree(webpage);
-            var indexer = new Indexer(10);
+            var indexer = new InMemoryIndexer();;
             var neighbors = indexer.FindNeighbors(nodes, nodes);
             if (neighbors.Count == 0)
                 Assert.Fail();
@@ -65,7 +66,7 @@ namespace tree_matching_csharp.Test
             stopwatch.Stop();
             Console.WriteLine($"Webpage to tree took: {stopwatch.ElapsedMilliseconds}");
            
-            var indexer = new Indexer(10);
+            var indexer = new InMemoryIndexer();
 
             stopwatch.Restart();
             var neighbors = indexer.FindNeighbors(nodes, nodes);

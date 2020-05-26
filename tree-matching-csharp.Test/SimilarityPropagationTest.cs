@@ -6,7 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using MoreLinq;
 using NUnit.Framework;
-using Neighbors = System.Collections.Generic.Dictionary<tree_matching_csharp.Node, System.Collections.Generic.HashSet<tree_matching_csharp.Scored<tree_matching_csharp.Node>>>;
+using tree_matching_csharp.indexers;
+using Neighbors = System.Collections.Generic.IDictionary<tree_matching_csharp.Node, System.Collections.Generic.HashSet<tree_matching_csharp.Scored<tree_matching_csharp.Node>>>;
 
 namespace tree_matching_csharp.Test
 {
@@ -16,7 +17,7 @@ namespace tree_matching_csharp.Test
         public async Task CheckThatSimilarityPropagationIsUseful()
         {
             var stopWatch = new Stopwatch();
-            var indexer = new Indexer(10);
+            var indexer = new InMemoryIndexer();
             var weights = new[] {0.3f, 0.05f};
 
             var original = File.ReadAllText("websites/linkedin.html");

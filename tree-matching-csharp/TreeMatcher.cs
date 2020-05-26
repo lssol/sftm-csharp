@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Common;
+using tree_matching_csharp.indexers;
 
 namespace tree_matching_csharp
 {
@@ -42,13 +43,14 @@ namespace tree_matching_csharp
         public async Task<IEnumerable<(string, string)>> MatchWebsites(string source, string target)
         {
             var watch = new Stopwatch();
-            var indexer = new Indexer(_param.LimitNeighbors);
+            var indexer = new InMemoryIndexer();
             
             watch.Restart();
             var sourceNodes = await DOM.WebpageToTree(source);
             var targetNodes = await DOM.WebpageToTree(target);
             watch.Stop();
             Console.WriteLine($"Creating trees took: {watch.ElapsedMilliseconds}");
+            Console.WriteLine($"The trees have {sourceNodes.Count()} and {targetNodes.Count()} nodes");
 
             if (!IsSignaturePresent(sourceNodes) || !IsSignaturePresent(targetNodes))
                 throw new Exception("The web documents are expected to contain signature attributes");

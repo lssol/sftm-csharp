@@ -31,11 +31,8 @@ namespace tree_matching_csharp
         }
 
         public Guid Id;
-        public string Value;
+        public IList<string> Value;
         public string Signature;
-        public string XPath;
-        public int SizeValue => Value.Length;
-        public int SizeXPath => XPath.Length;
         public Node Parent;
         public bool IsNoMatch;
     }
