@@ -15,12 +15,12 @@ namespace tree_matching_csharp.Test
             var watch = new Stopwatch();
             var treeMatcher = new TreeMatcher(new TreeMatcher.Parameters
             {
-                LimitNeighbors = 40,
+                LimitNeighbors = 10,
                 MetropolisParameters = new Metropolis.Parameters
                 {
                     Gamma        = 0.7f,
                     Lambda       = 0.7f,
-                    NbIterations = 100,
+                    NbIterations = 50,
                 },
                 NoMatchCost = 7,
                 PropagationParameters = new SimilarityPropagation.Parameters()
@@ -30,7 +30,8 @@ namespace tree_matching_csharp.Test
                     Sibling    = 0.3,
                     SiblingInv = 0.1,
                     ParentInv  = 0.1
-                }
+                },
+                MaxTokenAppearance = n => (int) Math.Sqrt(n)
             });
 
             var source = File.ReadAllText("websites/linkedin.html");

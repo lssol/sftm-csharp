@@ -14,13 +14,14 @@ namespace tree_matching_csharp
             public Metropolis.Parameters            MetropolisParameters  { get; set; }
             public double                           NoMatchCost           { get; set; }
             public int                              LimitNeighbors        { get; set; }
+            public Func<int, int>                   MaxTokenAppearance    { get; set; }
         }
 
         public class Result
         {
             public IEnumerable<(string, string)> SignatureMatching { get; set; }
-            public int NbMismatch { get; set; }
-            public int NbNoMatch { get; set; }
+            public int                           NbMismatch        { get; set; }
+            public int                           NbNoMatch         { get; set; }
         }
 
         private readonly Parameters _param;
@@ -47,7 +48,6 @@ namespace tree_matching_csharp
         public async Task<Result> MatchWebsites(string source, string target)
         {
             var watch   = new Stopwatch();
-            var indexer = new InMemoryIndexer(_param.LimitNeighbors);
 
             watch.Restart();
             var sourceNodes = await DOM.WebpageToTree(source);
@@ -55,6 +55,8 @@ namespace tree_matching_csharp
             watch.Stop();
             Console.WriteLine($"Creating trees took: {watch.ElapsedMilliseconds}");
             Console.WriteLine($"The trees have {sourceNodes.Count()} and {targetNodes.Count()} nodes");
+            
+            var indexer = new InMemoryIndexer(_param.LimitNeighbors, _param.MaxTokenAppearance(sourceNodes.Count()));
 
             if (!IsSignaturePresent(sourceNodes) || !IsSignaturePresent(targetNodes))
                 throw new Exception("The web documents are expected to contain signature attributes");
@@ -63,8 +65,8 @@ namespace tree_matching_csharp
             neighbors = SimilarityPropagation.PropagateSimilarity(neighbors, _param.PropagationParameters);
 
             var noMatchEdges = GetNoMatchEdges(sourceNodes, targetNodes);
-            var edges      = neighbors.GetEdges().Concat(noMatchEdges);
-            var metropolis = new Metropolis(_param.MetropolisParameters, edges, sourceNodes.Count() + targetNodes.Count());
+            var edges        = neighbors.GetEdges().Concat(noMatchEdges);
+            var metropolis   = new Metropolis(_param.MetropolisParameters, edges, sourceNodes.Count() + targetNodes.Count());
 
             watch.Restart();
             var matching = metropolis.Run();
@@ -83,7 +85,7 @@ namespace tree_matching_csharp
                 && m.Target != null
                 && targetSignatures.Contains(m.Source.Signature)
                 && m.Source.Signature != m.Target.Signature);
-            
+
             var signaturesMatching = matching.Select(m => (m.Source?.Signature, m.Target?.Signature));
 
             return new Result

@@ -14,7 +14,7 @@ namespace tree_matching_csharp.Test
         public async Task CheckThatSimilarityPropagationIsUseful()
         {
             var stopWatch = new Stopwatch();
-            var indexer = new InMemoryIndexer(200);
+            var indexer = new InMemoryIndexer(200, 200);
             var parameters = new SimilarityPropagation.Parameters()
             {
                 Envelop    = new []{0.7, 0.2},
