@@ -42,8 +42,15 @@ namespace tree_matching_csharp
                 var parentScore = neighbors.Score(pSource, pTarget);
                 IncreaseScore(newSimilarity, sourceNode, targetNode, score + currentEnvelop * parentScore * parameters.Parent);
                 IncreaseScore(newSimilarity, pSource, pTarget, parentScore + currentEnvelop * score * parameters.ParentInv);
-                
-                
+
+                if (sourceNode.LeftSibling == null || targetNode.LeftSibling == null) {
+                    IncreaseScore(newSimilarity, sourceNode, targetNode, score);
+                    continue;
+                }
+
+                var siblingScore = neighbors.Score(sourceNode.LeftSibling, targetNode.LeftSibling);
+                IncreaseScore(newSimilarity, sourceNode, targetNode, score + currentEnvelop * siblingScore * parameters.Sibling);
+                IncreaseScore(newSimilarity, sourceNode.LeftSibling, targetNode.LeftSibling, siblingScore + currentEnvelop * score * parameters.SiblingInv);
             }
 
             return newSimilarity;

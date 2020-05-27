@@ -15,7 +15,7 @@ namespace tree_matching_csharp.Test
             var watch = new Stopwatch();
             var treeMatcher = new TreeMatcher(new TreeMatcher.Parameters
             {
-                LimitNeighbors = 10,
+                LimitNeighbors = 50,
                 MetropolisParameters = new Metropolis.Parameters
                 {
                     Gamma        = 0.7f,
@@ -25,7 +25,7 @@ namespace tree_matching_csharp.Test
                 NoMatchCost = 7,
                 PropagationParameters = new SimilarityPropagation.Parameters()
                 {
-                    Envelop    = new[] {0.9, 0.2},
+                    Envelop    = new[] {0.7, 0.1},
                     Parent     = 0.5,
                     Sibling    = 0.3,
                     SiblingInv = 0.1,

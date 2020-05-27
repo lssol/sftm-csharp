@@ -17,11 +17,11 @@ namespace tree_matching_csharp.Test
             var indexer = new InMemoryIndexer(200, 200);
             var parameters = new SimilarityPropagation.Parameters()
             {
-                Envelop    = new []{0.7, 0.2},
+                Envelop    = new [] {0.7, 0.01},
                 Parent     = 0.8,
-                Sibling    = 0.3,
+                Sibling    = 0.4,
                 SiblingInv = 0.1,
-                ParentInv  = 0.1
+                ParentInv  = 0.3
             };
 
             var original = File.ReadAllText("websites/linkedin.html");
@@ -57,9 +57,9 @@ namespace tree_matching_csharp.Test
             var mistakesNoPropagation   = ComputeAccuracy(neighbors);
             
             stopWatch.Restart();
-            var newSimilarity = SimilarityPropagation.PropagateSimilarity(neighbors, parameters, 0.9);
+            parameters.Envelop.ForEach(envelop => neighbors = SimilarityPropagation.PropagateSimilarity(neighbors, parameters, envelop));
             stopWatch.Stop();
-            var mistakesWithPropagation = ComputeAccuracy(newSimilarity);
+            var mistakesWithPropagation = ComputeAccuracy(neighbors);
             Console.WriteLine($"Propagating the similarity took: {stopWatch.ElapsedMilliseconds}");
             
             Console.WriteLine($"Number of mistakes no propagation: {mistakesNoPropagation} / {mutantNodes.Count()}");
