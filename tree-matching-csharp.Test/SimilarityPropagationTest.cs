@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using MoreLinq;
 using NUnit.Framework;
-using tree_matching_csharp.indexers;
-using Neighbors = System.Collections.Generic.IDictionary<tree_matching_csharp.Node, System.Collections.Generic.HashSet<tree_matching_csharp.Scored<tree_matching_csharp.Node>>>;
 
 namespace tree_matching_csharp.Test
 {
@@ -17,8 +14,15 @@ namespace tree_matching_csharp.Test
         public async Task CheckThatSimilarityPropagationIsUseful()
         {
             var stopWatch = new Stopwatch();
-            var indexer = new InMemoryIndexer();
-            var weights = new[] {0.3f, 0.05f};
+            var indexer = new InMemoryIndexer(200);
+            var parameters = new SimilarityPropagation.Parameters()
+            {
+                Envelop    = new []{0.7, 0.2},
+                Parent     = 0.4,
+                Sibling    = 0.3,
+                SiblingInv = 0.1,
+                ParentInv  = 0.1
+            };
 
             var original = File.ReadAllText("websites/linkedin.html");
             var mutant   = File.ReadAllText("websites/linkedin_mutant.html");
@@ -35,9 +39,9 @@ namespace tree_matching_csharp.Test
             int ComputeAccuracy(Neighbors neighbors)
             {
                 var mistakes = 0;
-                foreach (var (targetNode, matchedNodes) in neighbors)
+                foreach (var (targetNode, matchedNodes) in neighbors.Value)
                 {
-                    var bestMatch = matchedNodes.MaxBy(n => n.Score).FirstOrDefault()?.Value;
+                    var bestMatch = matchedNodes.MaxBy(n => n.Value).FirstOrDefault().Key;
                     if (bestMatch == null || originalNodeToSignatureDic[bestMatch] != mutantNodeToSignatureDic[targetNode])
                         mistakes++;
                 }
@@ -53,13 +57,14 @@ namespace tree_matching_csharp.Test
             var mistakesNoPropagation   = ComputeAccuracy(neighbors);
             
             stopWatch.Restart();
-            SimilarityPropagation.PropagateSimilarity(neighbors, weights);
+            SimilarityPropagation.PropagateSimilarity(neighbors, parameters);
             stopWatch.Stop();
             var mistakesWithPropagation = ComputeAccuracy(neighbors);
             Console.WriteLine($"Propagating the similarity took: {stopWatch.ElapsedMilliseconds}");
             
             Console.WriteLine($"Number of mistakes no propagation: {mistakesNoPropagation} / {mutantNodes.Count()}");
             Console.WriteLine($"Number of mistakes with propagation: {mistakesWithPropagation} / {mutantNodes.Count()}");
+            Assert.True(mistakesNoPropagation > mistakesWithPropagation);
         }
     }
 }

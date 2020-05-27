@@ -4,23 +4,11 @@ using System.Collections.Generic;
 
 namespace tree_matching_csharp
 {
-    public class Scored<T>
-    {
-        public Scored(T value, float? score)
-        {
-            Value = value;
-            Score = score;
-        }
-
-        public T Value { get; set; }
-        public float? Score { get; set; }
-    }
-    
     public class Edge
     {
         public Node   Source;
         public Node   Target;
-        public float? Cost;
+        public double Cost;
     }
 
     public class Node
@@ -34,6 +22,7 @@ namespace tree_matching_csharp
         public IList<string> Value;
         public string Signature;
         public Node Parent;
+        public Node LeftSibling;
         public bool IsNoMatch;
     }
 
