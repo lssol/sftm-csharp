@@ -17,7 +17,6 @@ namespace tree_matching_csharp
             public float Gamma        { get; set; }
             public float Lambda       { get; set; }
             public int   NbIterations { get; set; }
-            public bool InMemoryAdjacentEdges { get; set; }
         }
 
         private readonly Dictionary<Node, HashSet<Edge>> _nodeToEdges;
@@ -25,18 +24,14 @@ namespace tree_matching_csharp
         private readonly IEnumerable<Edge>               _edges;
         private readonly Random                          _rand;
         private readonly int                             _nbNodes;
-        private          Dictionary<Edge, HashSet<Edge>> _adjacentEdges;
 
         public Metropolis(Parameters parameters, IEnumerable<Edge> edges, int nbNodes)
         {
             _params        = parameters;
             _nbNodes       = nbNodes;
-            _edges         = edges.OrderByDescending(e => e.Cost).ToList(); // Without the ToList(), the edges.foreach(e => ...) changes the reference of e
+            _edges = edges.OrderBy(edge => edge.Cost).ToList();
             _nodeToEdges   = ComputeNodeToEdgesDic();
             _rand          = new Random();
-            
-            if (_params.InMemoryAdjacentEdges)
-                _adjacentEdges = _edges.ToDictionary(e => e, GetAdjacentEdges);
         }
 
         public List<Edge> Run()
@@ -92,8 +87,8 @@ namespace tree_matching_csharp
 
         private double ComputeObjective(IEnumerable<Edge> matching)
         {
-            var cost = matching.Average(e => e.Cost) ?? 0;
-            return Math.Exp(-_params.Lambda * cost);
+            var cost = matching.Average(e => e.Cost);
+            return Math.Exp(-_params.Lambda * cost / matching.Count());
         }
 
         private List<Edge> SuggestMatching(List<Edge> previousMatching)
@@ -107,7 +102,7 @@ namespace tree_matching_csharp
             void KeepEdge(Edge edge)
             {
                 newMatching.Add(edge);
-                var adjacentEdges = _adjacentEdges?[edge] ?? GetAdjacentEdges(edge);
+                var adjacentEdges = GetAdjacentEdges(edge);
                 adjacentEdges.ForEach(e => edges.RemoveIfExist(edgesDic[e]));
             }
 

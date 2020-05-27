@@ -57,7 +57,7 @@ namespace tree_matching_csharp
         {
             var nodes = new List<Node>();
 
-            void Copy(IElement el, IParentNode parent, Node parentNode, string partialXPath)
+            Node Copy(IElement el, IParentNode parent, Node parentNode, Node leftSibling, string partialXPath)
             {
                 var newXPath = GetNewXPath(el, parent, partialXPath);
                 var tokenizedNode = TokenizeNode(el);
@@ -66,15 +66,19 @@ namespace tree_matching_csharp
                 {
                     Value     = tokenizedNode,
                     Signature = el.Attributes.GetNamedItem(AttributeName)?.Value,
-                    Parent    = parentNode
+                    Parent    = parentNode,
+                    LeftSibling = leftSibling
                 };
                 nodes.Add(node);
 
+                Node prevChild = null;
                 foreach (var child in el.Children)
-                    Copy(child, el, node, newXPath);
+                    prevChild = Copy(child, el, node, prevChild, newXPath);
+
+                return node;
             }
 
-            Copy(doc.Body, null, null, "");
+            Copy(doc.Body, null, null, null, "");
 
             return nodes;
         }

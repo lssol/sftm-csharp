@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Neighbors = System.Collections.Generic.IDictionary<tree_matching_csharp.Node, System.Collections.Generic.HashSet<tree_matching_csharp.Scored<tree_matching_csharp.Node>>>;
 
 namespace tree_matching_csharp
 {
@@ -21,18 +18,6 @@ namespace tree_matching_csharp
             }
         }
         
-        public static IEnumerable<Edge> NeighborsToEdges(Neighbors neighbors)
-        {
-            return neighbors.SelectMany(pair => pair
-                .Value
-                .Select(source => new Edge
-                {
-                    Cost   = source.Score,
-                    Source = source.Value,
-                    Target = pair.Key
-                }));
-        }
-
         public static Dictionary<T, HashSet<G>> PushAt<T, G>(this Dictionary<T, HashSet<G>> self, T key, G value)
         {
             if (self.ContainsKey(key))

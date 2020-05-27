@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 
-namespace tree_matching_csharp.indexers
+namespace tree_matching_csharp
 {
     public class Index
     {
+        private readonly int _maxNeighborsPerNode;
         private readonly IDictionary<string, IList<Node>> _index;
         private readonly HashSet<Node> _nodes;
         private double IdfPrecomputation { get; set; }
 
-        public Index()
+        public Index(int maxNeighborsPerNode)
         {
+            _maxNeighborsPerNode = maxNeighborsPerNode;
             _index = new Dictionary<string, IList<Node>>();
             _nodes = new HashSet<Node>();
         }
@@ -26,7 +27,7 @@ namespace tree_matching_csharp.indexers
                 _index.Add(token, new List<Node> {node});
         }
         
-        public HashSet<Scored<Node>> QueryIndex(IEnumerable<string> query)
+        public Dictionary<Node, double> QueryIndex(IEnumerable<string> query)
         {
             var hits = new Dictionary<Node, double>();
             foreach (var token in query)
@@ -44,36 +45,51 @@ namespace tree_matching_csharp.indexers
                 }
             }
 
-            return new HashSet<Scored<Node>>(hits.Select(hit => new Scored<Node>(hit.Key, (float) hit.Value) ));
+            return hits;
         }
 
         public Index PrecomputeIdf() { 
             IdfPrecomputation = Math.Log(_nodes.Count);
             return this;
         }
+
+        public Dictionary<Node, double> TruncateResults(Dictionary<Node, double> hits)
+        {
+            return hits
+                .OrderByDescending(hit => hit.Value)
+                .Take(_maxNeighborsPerNode)
+                .ToDictionary(hit => hit.Key, hit => hit.Value);
+        }
     }
     
-    public class InMemoryIndexer : IIndexer
+    public class InMemoryIndexer
     {
-        private Index  BuildIndex(IEnumerable<Node> sourceNodes)
+        private readonly int _maxNbNeighbor;
+
+        public InMemoryIndexer(int maxNbNeighbor)
         {
-            var index = new Index();
+            _maxNbNeighbor = maxNbNeighbor;
+        }
+
+        public Neighbors FindNeighbors(IEnumerable<Node> sourceNodes, IEnumerable<Node> targetNodes)
+        {
+            var index = BuildIndex(sourceNodes).PrecomputeIdf();
+            
+            var neighbors = new Neighbors();
+            foreach (var targetNode in targetNodes)
+                neighbors.Value[targetNode] = index.TruncateResults(index.QueryIndex(targetNode.Value));
+
+            return neighbors;
+        }
+        
+        private Index BuildIndex(IEnumerable<Node> sourceNodes)
+        {
+            var index = new Index(_maxNbNeighbor);
             foreach (var sourceNode in sourceNodes)
                 foreach (var value in sourceNode.Value)
                     index.Add(value, sourceNode);
 
             return index;
-        }
-
-        public IDictionary<Node, HashSet<Scored<Node>>> FindNeighbors(IEnumerable<Node> sourceNodes, IEnumerable<Node> targetNodes)
-        {
-            var index = BuildIndex(sourceNodes).PrecomputeIdf();
-            
-            var neighbors = new Dictionary<Node, HashSet<Scored<Node>>>();
-            foreach (var targetNode in targetNodes)
-                neighbors[targetNode] = index.QueryIndex(targetNode.Value);
-
-            return neighbors;
         }
     }
 }

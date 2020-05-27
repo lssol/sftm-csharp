@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using MoreLinq.Extensions;
 using NUnit.Framework;
-using tree_matching_csharp.indexers;
 
 namespace tree_matching_csharp.Test
 {
@@ -32,16 +31,18 @@ namespace tree_matching_csharp.Test
             var sourceNodes = sourceList.Select(s => new Node { Value = s.Split(" ")}).ToArray();
             var targetNodes = targetList.Select(s => new Node { Value = s.Split(" ")}).ToArray();
             
-            var indexer = new InMemoryIndexer();
+            var indexer = new InMemoryIndexer(10);
             var neighbors = indexer.FindNeighbors(sourceNodes, targetNodes);
             
-            if (neighbors.Count == 0)
+            if (neighbors.Value.Count == 0)
                 Assert.Fail();
             
             var exampleTarget = targetNodes[0];
-            var nodesAssociated = new HashSet<Node>(neighbors[exampleTarget].Select(n => n.Value));
-            if (!nodesAssociated.Contains(sourceNodes[0]))
-                Assert.Fail();
+            var nodesAssociated = new HashSet<Node>(neighbors.Value[exampleTarget].Select(n => n.Key));
+            
+            Assert.True(nodesAssociated.Contains(sourceNodes[0]));
+            Assert.True(nodesAssociated.Contains(sourceNodes[1]));
+            Assert.True(nodesAssociated.Contains(sourceNodes[2]));
         }
 
         [Test]
@@ -49,9 +50,9 @@ namespace tree_matching_csharp.Test
         {
             var webpage = DomTests.SimpleWebpage;
             var nodes = await DOM.WebpageToTree(webpage);
-            var indexer = new InMemoryIndexer();;
+            var indexer = new InMemoryIndexer(100);;
             var neighbors = indexer.FindNeighbors(nodes, nodes);
-            if (neighbors.Count == 0)
+            if (neighbors.Value.Count == 0)
                 Assert.Fail();
         }
         [Test]
@@ -66,19 +67,19 @@ namespace tree_matching_csharp.Test
             stopwatch.Stop();
             Console.WriteLine($"Webpage to tree took: {stopwatch.ElapsedMilliseconds}");
            
-            var indexer = new InMemoryIndexer();
+            var indexer = new InMemoryIndexer(100);
 
             stopwatch.Restart();
             var neighbors = indexer.FindNeighbors(nodes, nodes);
             stopwatch.Stop();
             Console.WriteLine($"find neighbors took: {stopwatch.ElapsedMilliseconds}");
             
-            if (neighbors.Count == 0)
+            if (neighbors.Value.Count == 0)
                 Assert.Fail();
             var mistakes = 0;
-            foreach (var (target, matchedSources) in neighbors)
+            foreach (var (target, matchedSources) in neighbors.Value)
             {
-                var bestMatch = matchedSources.MaxBy(n => n.Score).First().Value;
+                var bestMatch = matchedSources.MaxBy(n => n.Value).First().Key;
                 if (target != bestMatch)
                     mistakes++;
             }
