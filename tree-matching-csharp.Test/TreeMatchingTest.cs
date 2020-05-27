@@ -25,11 +25,11 @@ namespace tree_matching_csharp.Test
                 NoMatchCost = 7,
                 PropagationParameters = new SimilarityPropagation.Parameters()
                 {
-                    Envelop    = new[] {0.7, 0.2},
-                    Parent     = 0.4,
+                    Envelop    = new[] {0.9, 0.2},
+                    Parent     = 0.5,
                     Sibling    = 0.3,
                     SiblingInv = 0.1,
-                    ParentInv  = 0.1
+                    ParentInv  = 0.2
                 },
                 MaxTokenAppearance = n => (int) Math.Sqrt(n)
             });

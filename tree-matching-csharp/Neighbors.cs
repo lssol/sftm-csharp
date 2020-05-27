@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace tree_matching_csharp
 {
     public class Neighbors
     {
         public  Dictionary<Node, Dictionary<Node, double>> Value;
-        // private Dictionary<(Node, Node), double>           _edges;
         private IList<Edge>           _edges;
 
         public Neighbors()
@@ -14,20 +14,10 @@ namespace tree_matching_csharp
             Value = new Dictionary<Node, Dictionary<Node, double>>();
         }
 
-        public void InvalidateCache()
-        {
-            _edges = null;
-            // _sortedEdges = null;
-        }
+        public Dictionary<Node, double> Get(Node node) => Value.ContainsKey(node) ? Value[node] : null;
 
-        // public Dictionary<(Node, Node), double> GetEdges()
-        // {
-        //     if (_edges == null)
-        //         NeighborsToEdges();
-        //     
-        //     return _edges;
-        // }
-        
+        public double Score(Node sourceNode, Node targetNode) => (Get(targetNode)?.ContainsKey(sourceNode) ?? false) ? Value[targetNode][sourceNode] : 0;
+
         public IEnumerable<Edge> GetEdges()
         {
             if (_edges == null)

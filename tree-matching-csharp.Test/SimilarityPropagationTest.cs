@@ -18,7 +18,7 @@ namespace tree_matching_csharp.Test
             var parameters = new SimilarityPropagation.Parameters()
             {
                 Envelop    = new []{0.7, 0.2},
-                Parent     = 0.4,
+                Parent     = 0.8,
                 Sibling    = 0.3,
                 SiblingInv = 0.1,
                 ParentInv  = 0.1
@@ -57,9 +57,9 @@ namespace tree_matching_csharp.Test
             var mistakesNoPropagation   = ComputeAccuracy(neighbors);
             
             stopWatch.Restart();
-            SimilarityPropagation.PropagateSimilarity(neighbors, parameters);
+            var newSimilarity = SimilarityPropagation.PropagateSimilarity(neighbors, parameters, 0.9);
             stopWatch.Stop();
-            var mistakesWithPropagation = ComputeAccuracy(neighbors);
+            var mistakesWithPropagation = ComputeAccuracy(newSimilarity);
             Console.WriteLine($"Propagating the similarity took: {stopWatch.ElapsedMilliseconds}");
             
             Console.WriteLine($"Number of mistakes no propagation: {mistakesNoPropagation} / {mutantNodes.Count()}");

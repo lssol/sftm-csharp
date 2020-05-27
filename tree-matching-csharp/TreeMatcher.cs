@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using MoreLinq;
 
 namespace tree_matching_csharp
 {
@@ -62,7 +63,9 @@ namespace tree_matching_csharp
                 throw new Exception("The web documents are expected to contain signature attributes");
 
             var neighbors = indexer.FindNeighbors(sourceNodes, targetNodes);
-            neighbors = SimilarityPropagation.PropagateSimilarity(neighbors, _param.PropagationParameters);
+            _param.PropagationParameters.Envelop.ForEach(envelop => {
+                neighbors = SimilarityPropagation.PropagateSimilarity(neighbors, _param.PropagationParameters, envelop);
+            });
 
             var noMatchEdges = GetNoMatchEdges(sourceNodes, targetNodes);
             var edges        = neighbors.GetEdges().Concat(noMatchEdges);
