@@ -91,7 +91,11 @@ namespace tree_matching_csharp
             
             var neighbors = new Neighbors();
             foreach (var targetNode in targetNodes)
-                neighbors.Value[targetNode] = index.TruncateResults(index.QueryIndex(targetNode.Value));
+            {
+                var results = index.TruncateResults(index.QueryIndex(targetNode.Value));
+                if (results.Count != 0)
+                    neighbors.Value[targetNode] = results;
+            }
 
             return neighbors;
         }

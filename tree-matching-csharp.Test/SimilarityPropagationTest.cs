@@ -17,11 +17,11 @@ namespace tree_matching_csharp.Test
             var indexer = new InMemoryIndexer(200, 200);
             var parameters = new SimilarityPropagation.Parameters()
             {
-                Envelop    = new [] {0.7, 0.01},
-                Parent     = 0.8,
-                Sibling    = 0.4,
+                Envelop    = new [] {0.7, 0.05, 0.01},
+                Parent     = 0.6,
+                Sibling    = 0.2,
                 SiblingInv = 0.1,
-                ParentInv  = 0.3
+                ParentInv  = 0.4
             };
 
             var original = File.ReadAllText("websites/linkedin.html");
