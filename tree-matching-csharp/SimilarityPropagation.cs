@@ -16,10 +16,13 @@ namespace tree_matching_csharp
 
         private static void IncreaseScore(Neighbors neighbors, Node sourceNode, Node targetNode, double incr)
         {
-            var hits = neighbors.Get(targetNode) ?? new Dictionary<Node, double>();
+            if (Math.Abs(incr) < 0.001)
+                return;
+            var hits     = neighbors.Get(targetNode) ?? new Dictionary<Node, double>();
             var hitScore = hits.ContainsKey(sourceNode) ? hits[sourceNode] : 0;
             var newScore = hitScore + incr;
-            if (Math.Abs(newScore) < 0.001) return;
+            if (Math.Abs(newScore) < 0.001)
+                return;
             hits[sourceNode] = newScore;
             if (!neighbors.Value.ContainsKey(targetNode))
                 neighbors.Value[targetNode] = hits;
@@ -31,26 +34,21 @@ namespace tree_matching_csharp
             foreach (var (targetNode, hits) in neighbors.Value)
             foreach (var (sourceNode, score) in hits)
             {
+                IncreaseScore(newSimilarity, sourceNode, targetNode, score);
                 var pSource = sourceNode.Parent;
                 var pTarget = targetNode.Parent;
-                if (pSource == null || pTarget == null)
-                {
-                    IncreaseScore(newSimilarity, sourceNode, targetNode, score);
-                    continue;
-                }
+
+                if (pSource == null || pTarget == null) continue;
 
                 var parentScore = neighbors.Score(pSource, pTarget);
-                IncreaseScore(newSimilarity, sourceNode, targetNode, score + currentEnvelop * parentScore * parameters.Parent);
-                IncreaseScore(newSimilarity, pSource, pTarget, parentScore + currentEnvelop * score * parameters.ParentInv);
+                IncreaseScore(newSimilarity, sourceNode, targetNode, currentEnvelop * parentScore * parameters.Parent);
+                IncreaseScore(newSimilarity, pSource,    pTarget,    currentEnvelop * score       * parameters.ParentInv);
 
-                if (sourceNode.LeftSibling == null || targetNode.LeftSibling == null) {
-                    IncreaseScore(newSimilarity, sourceNode, targetNode, score);
-                    continue;
-                }
+                if (sourceNode.LeftSibling == null || targetNode.LeftSibling == null) continue;
 
                 var siblingScore = neighbors.Score(sourceNode.LeftSibling, targetNode.LeftSibling);
-                IncreaseScore(newSimilarity, sourceNode, targetNode, score + currentEnvelop * siblingScore * parameters.Sibling);
-                IncreaseScore(newSimilarity, sourceNode.LeftSibling, targetNode.LeftSibling, siblingScore + currentEnvelop * score * parameters.SiblingInv);
+                IncreaseScore(newSimilarity, sourceNode,             targetNode,             currentEnvelop * siblingScore * parameters.Sibling);
+                IncreaseScore(newSimilarity, sourceNode.LeftSibling, targetNode.LeftSibling, currentEnvelop * score        * parameters.SiblingInv);
             }
 
             return newSimilarity;
