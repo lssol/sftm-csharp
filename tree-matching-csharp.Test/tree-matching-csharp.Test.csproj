@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\tree-matching-csharp.Benchmark\tree-matching-csharp.Benchmark.csproj" />
       <ProjectReference Include="..\tree-matching-csharp\tree-matching-csharp.csproj" />
     </ItemGroup>
 

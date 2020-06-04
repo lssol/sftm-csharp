@@ -19,19 +19,31 @@ namespace tree_matching_csharp
             public int   NbIterations { get; set; }
         }
 
-        private readonly Dictionary<Node, HashSet<Edge>> _nodeToEdges;
-        private readonly Parameters                      _params;
-        private readonly IEnumerable<Edge>               _edges;
-        private readonly Random                          _rand;
-        private readonly int                             _nbNodes;
+        private readonly Dictionary<Node, HashSet<Edge>>        _nodeToEdges;
+        private readonly Parameters                             _params;
+        private readonly IEnumerable<Edge>                      _edges;
+        private readonly Random                                 _rand;
+        private readonly int                                    _nbNodes;
+        private readonly int                                    _maxNeighbors;
+        private          Dictionary<Edge, LinkedListNode<Edge>> _linkedListNodes;
+        private List<Edge> _newMatching;
+        private LinkedList<Edge> _linkedEdges;
+        private HashSet<Edge> _adjacentEdges;
+        private Dictionary<Edge, List<Edge>> _inMemoryAdjacentEdges;
 
-        public Metropolis(Parameters parameters, IEnumerable<Edge> edges, int nbNodes)
+        public Metropolis(Parameters parameters, IEnumerable<Edge> edges, int nbNodes, int maxNeighbors)
         {
-            _params        = parameters;
-            _nbNodes       = nbNodes;
-            _edges = edges.OrderBy(edge => edge.Cost).ToList();
-            _nodeToEdges   = ComputeNodeToEdgesDic();
-            _rand          = new Random();
+            _params          = parameters;
+            _nbNodes         = nbNodes;
+            _maxNeighbors    = maxNeighbors;
+            _edges           = edges.OrderBy(edge => edge.Cost).ToList();
+            _linkedListNodes = new Dictionary<Edge, LinkedListNode<Edge>>(_edges.Count());
+            _nodeToEdges     = ComputeNodeToEdgesDic();
+            _rand            = new Random();
+            _newMatching = new List<Edge>(_nbNodes + 10);
+            _linkedEdges = new LinkedList<Edge>();
+            _adjacentEdges = new HashSet<Edge>(_maxNeighbors *2);
+            // _inMemoryAdjacentEdges = PreComputeAdjacentEdges();
         }
 
         public List<Edge> Run()
@@ -42,18 +54,18 @@ namespace tree_matching_csharp
             var maxObjective = currentObjective;
             var bestMatching = currentMatching;
 
-            Enumerable.Range(0, _params.NbIterations).ForEach(_ =>
+            for (var i = 0; i < _params.NbIterations; i++)
             {
                 var matching        = SuggestMatching(currentMatching);
                 var objective       = ComputeObjective(matching);
                 var acceptanceRatio = objective / currentObjective;
-                if (!(_rand.NextDouble() <= acceptanceRatio)) return;
+                if (!(_rand.NextDouble() <= acceptanceRatio)) continue;
                 currentMatching  = matching;
                 currentObjective = objective;
-                if (!(currentObjective > maxObjective)) return;
+                if (!(currentObjective > maxObjective)) continue;
                 maxObjective = currentObjective;
                 bestMatching = currentMatching;
-            });
+            }
 
             return bestMatching;
         }
@@ -74,17 +86,29 @@ namespace tree_matching_csharp
             return nodeToEdges;
         }
 
-        private HashSet<Edge> GetAdjacentEdges(Edge edge)
+        private List<Edge> GetAdjacentEdges(Edge edge)
         {
-            var result = new HashSet<Edge>();
+            _adjacentEdges.Clear();
             if (edge.Source != null)
-                result.UnionWith(_nodeToEdges[edge.Source]);
+                _adjacentEdges.UnionWith(_nodeToEdges[edge.Source]);
             if (edge.Target != null)
-                result.UnionWith(_nodeToEdges[edge.Target]);
+                _adjacentEdges.UnionWith(_nodeToEdges[edge.Target]);
 
-            return result;
+            return new List<Edge>(_adjacentEdges);
         }
 
+        private Dictionary<Edge, List<Edge>> PreComputeAdjacentEdges()
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var adjacentEdges = new Dictionary<Edge, List<Edge>>(_edges.Count());
+            foreach (var edge in _edges)
+                adjacentEdges.Add(edge, GetAdjacentEdges(edge));
+
+            stopwatch.Stop();
+            Console.WriteLine($"Precomputing the edges took: {stopwatch.ElapsedMilliseconds}");
+            return adjacentEdges;
+        }
         private double ComputeObjective(IEnumerable<Edge> matching)
         {
             var cost = matching.Average(e => e.Cost);
@@ -93,24 +117,24 @@ namespace tree_matching_csharp
 
         private List<Edge> SuggestMatching(List<Edge> previousMatching)
         {
-            var newMatching = new List<Edge>(_nbNodes + 10);
-
-            var edges    = new LinkedList<Edge>();
-            var edgesDic = new Dictionary<Edge, LinkedListNode<Edge>>(_edges.Count());
-            _edges.ForEach(e => { edgesDic.Add(e, edges.AddLast(e)); });
+            _newMatching.Clear();
+            _linkedEdges.Clear();
+            _linkedListNodes.Clear();
+            foreach (var edge in _edges)
+                _linkedListNodes.Add(edge, _linkedEdges.AddLast(edge));
 
             void KeepEdge(Edge edge)
             {
-                newMatching.Add(edge);
-                var adjacentEdges = GetAdjacentEdges(edge);
-                adjacentEdges.ForEach(e => edges.RemoveIfExist(edgesDic[e]));
+                _newMatching.Add(edge);
+                var adjacentEdges = GetAdjacentEdges(edge); // _inMemoryAdjacentEdges[edge];
+                foreach (var e in adjacentEdges) _linkedEdges.RemoveIfExist(_linkedListNodes[e]);
             }
 
             var p = _rand.Next(0, previousMatching.Count);
             Enumerable.Range(0, p).ForEach(i => KeepEdge(previousMatching[i]));
 
-            while (edges.Count > 0)
-                foreach (var edge in edges)
+            while (_linkedEdges.Count > 0)
+                foreach (var edge in _linkedEdges)
                 {
                     if (_rand.NextDouble() >= _params.Gamma)
                         continue;
@@ -118,7 +142,7 @@ namespace tree_matching_csharp
                     break;
                 }
 
-            return newMatching;
+            return _newMatching;
         }
     }
 }

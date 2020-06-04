@@ -9,7 +9,7 @@ namespace tree_matching_csharp.Benchmark
         static async Task Main(string[] args)
         {
             var mutationBenchmark = new MutationBenchmark();
-            var results =  mutationBenchmark.RunSFTM();
+            var results =  mutationBenchmark.Run();
             await foreach (var result in results)
             {
                 Console.WriteLine(new

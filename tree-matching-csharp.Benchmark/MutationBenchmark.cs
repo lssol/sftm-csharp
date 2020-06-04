@@ -18,32 +18,43 @@ namespace tree_matching_csharp.Benchmark
             public MutationCouple                MutationCouple     { get; set; }
             public int                           Total              { get; set; }
             public int                           MutationsMade      { get; set; }
-            public int GoodMatch { get; set; }
-            public int MaxGoodMatch { get; set; }
+            public int                           GoodMatch          { get; set; }
+            public int                           MaxGoodMatch       { get; set; }
         }
 
-        public async IAsyncEnumerable<Result> RunSFTM()
+        private Result ToOutput(WebsiteMatcher.Result result, MutationCouple mutationCouple)
         {
-            var mongoRepo = MongoRepository.InitConnection();
+            return new Result
+            {
+                Matches            = result.SignatureMatching,
+                Mismatch           = result.NbMismatch,
+                NoMatchUnjustified = result.NbNoMatchUnjustified,
+                MatcherLabel       = Settings.SFTMLabel,
+                MatchingDuration   = result.ComputationTime,
+                MutationCouple     = mutationCouple,
+                NoMatch            = result.NbNoMatch,
+                Total              = result.Total,
+                MutationsMade      = mutationCouple.Mutant.NbMutations,
+                MaxGoodMatch       = result.MaxGoodMatches,
+                GoodMatch          = result.GoodMatches
+            };
+        }
+
+        public async IAsyncEnumerable<Result> Run()
+        {
+            var sftm               = new SftmTreeMatcher(Settings.SFTMParameters);
+            var rted               = new RTED(Settings.RTEDParameters);
+            var sftmWebsiteMatcher = new WebsiteMatcher(sftm);
+            var rtedWebsiteMatcher = new WebsiteMatcher(rted);
+            var mongoRepo          = MongoRepository.InitConnection();
             foreach (var (original, mutant) in mongoRepo.GetCouples())
             {
-                var treeMatcher = new TreeMatcher(Settings.SFTMParameters);
-
-                var result = await treeMatcher.MatchWebsites(original.Content, mutant.Content);
-                yield return new Result
-                {
-                    Matches            = result.SignatureMatching,
-                    Mismatch           = result.NbMismatch,
-                    NoMatchUnjustified = result.NbNoMatchUnjustified,
-                    MatcherLabel       = Settings.SFTMLabel,
-                    MatchingDuration   = result.ComputationTime,
-                    MutationCouple     = new MutationCouple {Mutant = mutant, Original = original},
-                    NoMatch            = result.NbNoMatch,
-                    Total              = result.Total,
-                    MutationsMade      = mutant.NbMutations,
-                    MaxGoodMatch = result.MaxGoodMatches,
-                    GoodMatch = result.GoodMatches
-                };
+                // var resultRTED = await rtedWebsiteMatcher.MatchWebsites(original.Content, mutant.Content);
+                var resultSFTM = await sftmWebsiteMatcher.MatchWebsites(original.Content, mutant.Content);
+                var mutationCouple = new MutationCouple{Mutant = mutant, Original = original};
+                
+                yield return ToOutput(resultSFTM, mutationCouple);
+                // yield return ToOutput(resultRTED, mutationCouple);
             }
         }
     }

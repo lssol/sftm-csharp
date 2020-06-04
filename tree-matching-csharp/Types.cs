@@ -16,6 +16,7 @@ namespace tree_matching_csharp
         public Node()
         {
             Id = Guid.NewGuid();
+            Children = new List<Node>();
         }
 
         public Guid Id;
@@ -23,7 +24,7 @@ namespace tree_matching_csharp
         public string Signature;
         public Node Parent;
         public Node LeftSibling;
-        public bool IsNoMatch;
+        public IList<Node> Children;
     }
 
     public class TreeMatchingOutput

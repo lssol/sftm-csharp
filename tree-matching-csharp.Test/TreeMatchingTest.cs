@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using tree_matching_csharp.Benchmark;
 
 namespace tree_matching_csharp.Test
 {
@@ -13,7 +14,7 @@ namespace tree_matching_csharp.Test
         public async Task TestTreeMatching()
         {
             var watch = new Stopwatch();
-            var treeMatcher = new TreeMatcher(new TreeMatcher.Parameters
+            var treeMatcher = new SftmTreeMatcher(new SftmTreeMatcher.Parameters
             {
                 LimitNeighbors = 100,
                 MetropolisParameters = new Metropolis.Parameters
@@ -38,8 +39,9 @@ namespace tree_matching_csharp.Test
             var source = File.ReadAllText("websites/linkedin.html");
             var target = File.ReadAllText("websites/linkedin_mutant.html");
 
+            var websiteMatcher = new WebsiteMatcher(treeMatcher);
             watch.Restart();
-            var matching = await treeMatcher.MatchWebsites(source, target);
+            var matching = await websiteMatcher.MatchWebsites(source, target);
             watch.Stop();
             Console.WriteLine($"Overall Matching the websites took: {watch.ElapsedMilliseconds}");
 

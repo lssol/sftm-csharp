@@ -13,9 +13,9 @@ namespace tree_matching_csharp.Benchmark
 
         public const string SFTMLabel = "SFTM";
 
-        public static readonly TreeMatcher.Parameters SFTMParameters = new TreeMatcher.Parameters
+        public static readonly SftmTreeMatcher.Parameters SFTMParameters = new SftmTreeMatcher.Parameters
         {
-            LimitNeighbors = 10,
+            LimitNeighbors = 20,
             MetropolisParameters = new Metropolis.Parameters
             {
                 Gamma        = 1f,
@@ -32,6 +32,15 @@ namespace tree_matching_csharp.Benchmark
                 ParentInv  = 0.6
             },
             MaxTokenAppearance = n => (int) Math.Sqrt(n)
+        };
+
+        public const string UrlRTED = "http://163.172.16.184:7040";
+
+        public static readonly RTED.Parameters RTEDParameters = new RTED.Parameters
+        {
+            DeletionCost = 1,
+            InsertionCost = 1,
+            RelabelCost = 1,
         };
     }
 }
