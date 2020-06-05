@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 
@@ -10,15 +11,24 @@ namespace tree_matching_csharp.Benchmark
         {
             var mutationBenchmark = new MutationBenchmark();
             var results =  mutationBenchmark.Run();
+            Directory.CreateDirectory("results");
+            await using var file = File.AppendText($"results/{DateTime.Now.ToFileTime()}");
             await foreach (var result in results)
             {
-                Console.WriteLine(new
+                var match = new
                 {
+                    Id              = result.MutationCouple.Mutant.Id.ToString(),
+                    Label           = result.MatcherLabel,
                     Success         = 100 * ((double)result.GoodMatch / result.MaxGoodMatch),
                     ComputationTime = (int) result.MatchingDuration,
-                    Total = result.Total,
+                    result.Total,
                     MutationPercentage = 100 * ((double) result.MutationsMade / result.Total)
-                }.ToJson());
+                }.ToJson();
+                
+                file.WriteLine(match);
+                Console.WriteLine(match);
+                
+                
             }
         }
     }

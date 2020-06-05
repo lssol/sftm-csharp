@@ -22,14 +22,14 @@ namespace tree_matching_csharp.Benchmark
             public int                           MaxGoodMatch       { get; set; }
         }
 
-        private Result ToOutput(WebsiteMatcher.Result result, MutationCouple mutationCouple)
+        private Result ToOutput(WebsiteMatcher.Result result, MutationCouple mutationCouple, string label)
         {
             return new Result
             {
                 Matches            = result.SignatureMatching,
                 Mismatch           = result.NbMismatch,
                 NoMatchUnjustified = result.NbNoMatchUnjustified,
-                MatcherLabel       = Settings.SFTMLabel,
+                MatcherLabel       = label,
                 MatchingDuration   = result.ComputationTime,
                 MutationCouple     = mutationCouple,
                 NoMatch            = result.NbNoMatch,
@@ -49,12 +49,12 @@ namespace tree_matching_csharp.Benchmark
             var mongoRepo          = MongoRepository.InitConnection();
             foreach (var (original, mutant) in mongoRepo.GetCouples())
             {
-                // var resultRTED = await rtedWebsiteMatcher.MatchWebsites(original.Content, mutant.Content);
+                var resultRTED = rtedWebsiteMatcher.MatchWebsites(original.Content, mutant.Content);
                 var resultSFTM = await sftmWebsiteMatcher.MatchWebsites(original.Content, mutant.Content);
                 var mutationCouple = new MutationCouple{Mutant = mutant, Original = original};
                 
-                yield return ToOutput(resultSFTM, mutationCouple);
-                // yield return ToOutput(resultRTED, mutationCouple);
+                yield return ToOutput(resultSFTM, mutationCouple, Settings.SFTMLabel);
+                yield return ToOutput(await resultRTED, mutationCouple, Settings.RTEDLabel);
             }
         }
     }

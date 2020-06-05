@@ -1,8 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
+using AngleSharp.Common;
 using MoreLinq;
 using Newtonsoft.Json;
 
@@ -35,7 +38,7 @@ namespace tree_matching_csharp.Benchmark
                 public int Id2 { get; set; }
             }
 
-            public int                ComputationTime { get; set; }
+            public int                Time { get; set; }
             public double             Distance        { get; set; }
             public IEnumerable<Match> Matching        { get; set; }
         }
@@ -43,7 +46,7 @@ namespace tree_matching_csharp.Benchmark
         public RTED(Parameters parameters)
         {
             _parameters = parameters;
-            _client     = new HttpClient();
+            _client = new HttpClient {Timeout = Timeout.InfiniteTimeSpan};
         }
 
         public async Task<TreeMatcherResponse> MatchTrees(IEnumerable<Node> sourceNodes, IEnumerable<Node> targetNodes)
@@ -71,15 +74,15 @@ namespace tree_matching_csharp.Benchmark
             var response        = await _client.PostAsync(Settings.UrlRTED, contentInput);
             var responseContent = await response.Content.ReadAsStringAsync();
             var parsedResponse  = JsonConvert.DeserializeObject<ResponseApi>(responseContent);
-
+            
             return new TreeMatcherResponse
             {
-                ComputationTime = parsedResponse.ComputationTime,
+                ComputationTime = parsedResponse.Time,
                 Edges = parsedResponse.Matching.Select(m => new Edge
                 {
-                    Source = sourceIds[m.Id1],
-                    Target = targetIds[m.Id2],
-                })
+                    Source = sourceIds.GetOrDefault(m.Id1, null),
+                    Target = targetIds.GetOrDefault(m.Id2, null)
+                }).Where(e => e.Source != null || e.Target != null)
             };
         }
 

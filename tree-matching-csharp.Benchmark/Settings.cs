@@ -12,6 +12,7 @@ namespace tree_matching_csharp.Benchmark
         }
 
         public const string SFTMLabel = "SFTM";
+        public const string RTEDLabel = "RTED";
 
         public static readonly SftmTreeMatcher.Parameters SFTMParameters = new SftmTreeMatcher.Parameters
         {
@@ -25,10 +26,10 @@ namespace tree_matching_csharp.Benchmark
             NoMatchCost = 0.2,
             PropagationParameters = new SimilarityPropagation.Parameters()
             {
-                Envelop    = new[] {0.7, 0.05},
-                Parent     = 0.0,
-                Sibling    = 0.0,
-                SiblingInv = 0.0,
+                Envelop    = new[] {0.7, 0.08},
+                Parent     = 0.2,
+                Sibling    = 0.1,
+                SiblingInv = 0.1,
                 ParentInv  = 0.6
             },
             MaxTokenAppearance = n => (int) Math.Sqrt(n)

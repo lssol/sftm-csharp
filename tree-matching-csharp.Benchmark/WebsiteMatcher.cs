@@ -45,7 +45,7 @@ namespace tree_matching_csharp.Benchmark
             commonSignatures.IntersectWith(targetSignatures);
 
             var nbNoMatch = matching.Edges.Count(m =>
-                commonSignatures.Contains(m.Source?.Signature ?? m.Target.Signature)
+                commonSignatures.Contains(m.Source?.Signature ?? m.Target?.Signature)
                 && (m.Source == null || m.Target == null)
             );
             var nbMismatch  = matching.Edges.Count(m => m.Source != null && m.Target != null && m.Source.Signature != m.Target.Signature);

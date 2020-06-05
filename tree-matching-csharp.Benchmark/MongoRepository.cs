@@ -59,7 +59,8 @@ namespace tree_matching_csharp.Benchmark
 
         public IEnumerable<MutationCouple> GetCouples()
         {
-            var filter = Builders<DOMVersion>.Filter.Eq(doc => doc.Original, null);
+            var builder = Builders<DOMVersion>.Filter;
+            var filter = builder.Eq(doc => doc.Original, null) & builder.Lt(doc => doc.Total, 1000);
             var cursor = _mutationCollection.Find(filter).ToCursor();
             foreach (var original in cursor.ToEnumerable())
             {
