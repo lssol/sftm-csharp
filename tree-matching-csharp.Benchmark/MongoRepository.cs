@@ -1,47 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace tree_matching_csharp.Benchmark
 {
-    public class DOMVersion
-    {
-        public ObjectId  Id            { get; set; }
-        public string    Url           { get; set; }
-        public string    Content       { get; set; }
-        public int       Total         { get; set; }
-        public ObjectId? Original      { get; set; }
-        public BsonValue MutationsMade { get; set; }
-        public int       NbMutations   { get; set; }
-    }
-
-    public class MutationCouple
-    {
-        public DOMVersion Original { get; set; }
-        public DOMVersion Mutant   { get; set; }
-
-        public void Deconstruct(out DOMVersion original, out DOMVersion mutant)
-        {
-            original = Original;
-            mutant   = Mutant;
-        }
-    }
-
     public class MongoRepository
     {
         private static   MongoRepository              _instance;
         private readonly IMongoCollection<DOMVersion> _mutationCollection;
+        private readonly IMongoCollection<SimulationResult> _simulationResultsCollection;
 
-        private MongoRepository(IMongoCollection<DOMVersion> mutationCollection)
+
+        private MongoRepository(IMongoCollection<DOMVersion> mutationCollection, IMongoCollection<SimulationResult> simulationResultsCollection)
         {
             _mutationCollection = mutationCollection;
+            _simulationResultsCollection = simulationResultsCollection;
         }
 
-        public static MongoRepository InitConnection()
+        public static async Task<MongoRepository> InitConnection()
         {
             if (_instance != null)
                 return _instance;
@@ -51,17 +31,32 @@ namespace tree_matching_csharp.Benchmark
             var pack = new ConventionPack {new CamelCaseElementNameConvention()};
             ConventionRegistry.Register("camel case", pack, t => true);
 
-            var collection = database.GetCollection<DOMVersion>(Settings.Mongo.MutationCollection);
-            _instance = new MongoRepository(collection);
+            var mutationCollection = database.GetCollection<DOMVersion>(Settings.Mongo.MutationCollection);
+            var simulationResultCollection = database.GetCollection<SimulationResult>(Settings.Mongo.ResultCollection);
+            await simulationResultCollection.Indexes?.CreateOneAsync(Builders<SimulationResult>.IndexKeys.Ascending(s => s.Label));
+            await simulationResultCollection.Indexes?.CreateOneAsync(Builders<SimulationResult>.IndexKeys.Ascending(s => s.OriginalId));
+            await simulationResultCollection.Indexes?.CreateOneAsync(Builders<SimulationResult>.IndexKeys.Ascending(s => s.MutantId));
+            _instance = new MongoRepository(mutationCollection, simulationResultCollection);
 
             return _instance;
+        }
+
+        public void SaveResults(SimulationResult result)
+        {
+            _simulationResultsCollection.InsertOne(result);
+        }
+
+        public async Task<bool> MeasureAlreadyExists(string label, string mutantId)
+        {
+            return await _simulationResultsCollection.AsQueryable()
+                .AnyAsync(s => s.Label == label && s.MutantId == mutantId);
         }
 
         public IEnumerable<MutationCouple> GetCouples()
         {
             var builder = Builders<DOMVersion>.Filter;
-            var filter = builder.Eq(doc => doc.Original, null) & builder.Lt(doc => doc.Total, 1000);
-            var cursor = _mutationCollection.Find(filter).ToCursor();
+            var filter  = builder.Eq(doc => doc.Original, null) & builder.Lt(doc => doc.Total, Settings.MaxSizeWebsite);
+            var cursor  = _mutationCollection.Find(filter).ToCursor();
             foreach (var original in cursor.ToEnumerable())
             {
                 var filterBuilder = Builders<DOMVersion>.Filter;

@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace tree_matching_csharp.Benchmark
 {
-    public class RTED : ITreeMatcher
+    public class RtedTreeMatcher : ITreeMatcher
     {
         private readonly Parameters _parameters;
         private readonly HttpClient _client;
@@ -43,7 +43,7 @@ namespace tree_matching_csharp.Benchmark
             public IEnumerable<Match> Matching        { get; set; }
         }
 
-        public RTED(Parameters parameters)
+        public RtedTreeMatcher(Parameters parameters)
         {
             _parameters = parameters;
             _client = new HttpClient {Timeout = Timeout.InfiniteTimeSpan};

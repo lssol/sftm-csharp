@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from os import listdir
 from os.path import isfile, join
 import json
+import numpy as np
 
 #%%
 folder = 'results'
@@ -35,3 +36,6 @@ sns.scatterplot(x="total", y="computationTime", data=df, hue='label')
 sns.lmplot(x="total", y="computationTime", data=df[df['label'] == 'SFTM'], fit_reg=True)
 # %%
 df[df['label'] == 'SFTM']['computationTime'].hist()
+
+#%%
+sns.lmplot(x="total", y="computationTime", data=df[df['label'] == 'RTED'], order=3)

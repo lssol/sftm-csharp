@@ -1,60 +1,59 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using MoreLinq.Extensions;
 
 namespace tree_matching_csharp.Benchmark
 {
-    public class MutationBenchmark
+    public static class MutationBenchmark
     {
-        public class Result
+        private static SimulationResult ToSimulationResult(WebsiteMatcher.Result result, MutationCouple mutationCouple, string label)
         {
-            public string                        MatcherLabel       { get; set; }
-            public int                           NoMatch            { get; set; }
-            public int                           NoMatchUnjustified { get; set; }
-            public int                           Mismatch           { get; set; }
-            public long                          MatchingDuration   { get; set; }
-            public IEnumerable<(string, string)> Matches            { get; set; }
-            public MutationCouple                MutationCouple     { get; set; }
-            public int                           Total              { get; set; }
-            public int                           MutationsMade      { get; set; }
-            public int                           GoodMatch          { get; set; }
-            public int                           MaxGoodMatch       { get; set; }
-        }
-
-        private Result ToOutput(WebsiteMatcher.Result result, MutationCouple mutationCouple, string label)
-        {
-            return new Result
+            return new SimulationResult
             {
-                Matches            = result.SignatureMatching,
                 Mismatch           = result.NbMismatch,
                 NoMatchUnjustified = result.NbNoMatchUnjustified,
-                MatcherLabel       = label,
-                MatchingDuration   = result.ComputationTime,
-                MutationCouple     = mutationCouple,
+                Label       = label,
+                ComputationTime   = result.ComputationTime,
                 NoMatch            = result.NbNoMatch,
                 Total              = result.Total,
-                MutationsMade      = mutationCouple.Mutant.NbMutations,
-                MaxGoodMatch       = result.MaxGoodMatches,
-                GoodMatch          = result.GoodMatches
+                NbMutationsMade      = mutationCouple.Mutant.NbMutations,
+                MutantId = mutationCouple.Mutant.Id.ToString(),
+                OriginalId = mutationCouple.Original.Id.ToString(),
+                Success = result.GoodMatches / (double) result.MaxGoodMatches,
+                MutationsMade = mutationCouple.Mutant.MutationsMade
+                    .ToLookup(m => m.MutationType, m => m)
+                    .ToDictionary(m => m.Key, m => m.Count())
             };
         }
 
-        public async IAsyncEnumerable<Result> Run()
+        public static async IAsyncEnumerable<SimulationResult> Run(string label, ITreeMatcher matcher)
         {
-            var sftm               = new SftmTreeMatcher(Settings.SFTMParameters);
-            var rted               = new RTED(Settings.RTEDParameters);
-            var sftmWebsiteMatcher = new WebsiteMatcher(sftm);
-            var rtedWebsiteMatcher = new WebsiteMatcher(rted);
-            var mongoRepo          = MongoRepository.InitConnection();
+            var websiteMatcher = new WebsiteMatcher(matcher);
+            var mongoRepo          = await MongoRepository.InitConnection();
             foreach (var (original, mutant) in mongoRepo.GetCouples())
             {
-                var resultRTED = rtedWebsiteMatcher.MatchWebsites(original.Content, mutant.Content);
-                var resultSFTM = await sftmWebsiteMatcher.MatchWebsites(original.Content, mutant.Content);
+                if (await mongoRepo.MeasureAlreadyExists(label, mutant.Id.ToString()))
+                {
+                    Console.WriteLine("Skipped couple");
+                    continue;
+                }
+
+                WebsiteMatcher.Result results;
+                try
+                {
+                    results = await websiteMatcher.MatchWebsites(original.Content, mutant.Content);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    continue;
+                }
+                
                 var mutationCouple = new MutationCouple{Mutant = mutant, Original = original};
                 
-                yield return ToOutput(resultSFTM, mutationCouple, Settings.SFTMLabel);
-                yield return ToOutput(await resultRTED, mutationCouple, Settings.RTEDLabel);
+                yield return results == null ? null : ToSimulationResult(results, mutationCouple, label);
             }
         }
     }

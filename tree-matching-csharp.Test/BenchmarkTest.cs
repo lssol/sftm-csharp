@@ -11,7 +11,7 @@ namespace tree_matching_csharp.Test
         [Test]
         public async Task TestRTED()
         {
-            var rted = new RTED(new RTED.Parameters
+            var rted = new RtedTreeMatcher(new RtedTreeMatcher.Parameters
             {
                 DeletionCost  = 1,
                 InsertionCost = 1,
