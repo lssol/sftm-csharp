@@ -9,11 +9,10 @@ namespace tree_matching_csharp.Test
         [Test]
         public void Test()
         {
-            var tuples = new[] {("sacha", 4), ("ilan", 3), ("sacha", 9)};
-            var lookup = tuples.ToLookup(t => t.Item1, t => t.Item2);
-            var dic = lookup.ToDictionary(m => m.Key, m => m.Count());
-            Console.WriteLine(lookup["sacha"].ToString());
-            Console.WriteLine("hello world");
+            var str1 = new[] {"sacha", "tommy", "tommy"};
+            var str2 = new[] {"Drink", "tommy", "tommy", "leave"};
+            var inter = str1.Intersect(str2);
+            Console.WriteLine("hello");
         }
     }
 }

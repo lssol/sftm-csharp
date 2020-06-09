@@ -6,21 +6,16 @@ from os import listdir
 from os.path import isfile, join
 import json
 import numpy as np
+from pymongo import MongoClient
 
 #%%
-folder = 'results'
-files = [f for f in listdir(folder) if isfile(join(folder, f))]
-files.sort(reverse=True)
+uri = 'mongodb://wehave_prod%40service:AX3ohnia@datalakestar.amarislab.com:27018/?authMechanism=PLAIN&ssl=true'
+db = MongoClient(uri).get_database('locatorBenchmark')
+collection = db['VLDB_Mutation_SimulationResults']
 
-final_path = join(folder, files[0])
-matchings = []
-with open(final_path) as fp:
-    line = fp.readline()
-    while line:
-        j = json.loads(line)
-        matchings.append(j)
-        line = fp.readline()
-df = pd.DataFrame(matchings)
+results = list(collection.find())
+df = pd.DataFrame(results)
+
 df = df[df['mutationPercentage'] < 50]
 df.describe()
 #%%

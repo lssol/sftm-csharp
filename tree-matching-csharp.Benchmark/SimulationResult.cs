@@ -17,5 +17,6 @@ namespace tree_matching_csharp.Benchmark
         public int                     Mismatch           { get; set; }
         public int                     NbMutationsMade    { get; set; }
         public Dictionary<string, int> MutationsMade      { get; set; }
+        public FTMCost.Cost            FTMCost            { get; set; }
     }
 }

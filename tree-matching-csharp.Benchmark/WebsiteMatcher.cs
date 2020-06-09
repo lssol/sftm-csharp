@@ -11,6 +11,7 @@ namespace tree_matching_csharp.Benchmark
         public class Result
         {
             public IEnumerable<(string, string)> SignatureMatching    { get; set; }
+            public IEnumerable<Edge>             Matching             { get; set; }
             public int                           NbMismatch           { get; set; }
             public int                           NbNoMatch            { get; set; }
             public int                           NbNoMatchUnjustified { get; set; }
@@ -62,7 +63,8 @@ namespace tree_matching_csharp.Benchmark
                 ComputationTime      = computationTime,
                 Total                = minCount,
                 MaxGoodMatches       = commonSignatures.Count,
-                GoodMatches          = goodMatches
+                GoodMatches          = goodMatches,
+                Matching             = matching.Edges
             };
         }
 
