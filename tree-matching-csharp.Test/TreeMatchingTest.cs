@@ -10,31 +10,33 @@ namespace tree_matching_csharp.Test
 {
     public class TreeMatchingTest
     {
+        public static SftmTreeMatcher.Parameters _parameters = new SftmTreeMatcher.Parameters
+        {
+            LimitNeighbors = 100,
+            MetropolisParameters = new Metropolis.Parameters
+            {
+                Gamma        = 1f,
+                Lambda       = 0.7f,
+                NbIterations = 50,
+            },
+            NoMatchCost = 0.2,
+            PropagationParameters = new SimilarityPropagation.Parameters()
+            {
+                Envelop = new[] {0.7, 0.0},
+                // Envelop    = new[] {0.0},
+                Parent     = 0.0,
+                Sibling    = 0.0,
+                SiblingInv = 0.0,
+                ParentInv  = 0.5
+            },
+            MaxTokenAppearance = n => (int) Math.Sqrt(n)
+        };
+
         [Test]
         public async Task TestTreeMatching()
         {
-            var watch = new Stopwatch();
-            var treeMatcher = new SftmTreeMatcher(new SftmTreeMatcher.Parameters
-            {
-                LimitNeighbors = 100,
-                MetropolisParameters = new Metropolis.Parameters
-                {
-                    Gamma        = 1f,
-                    Lambda       = 0.7f,
-                    NbIterations = 50,
-                },
-                NoMatchCost = 0.2,
-                PropagationParameters = new SimilarityPropagation.Parameters()
-                {
-                    Envelop    = new[] {0.7, 0.0},
-                    // Envelop    = new[] {0.0},
-                    Parent     = 0.0,
-                    Sibling    = 0.0,
-                    SiblingInv = 0.0,
-                    ParentInv  = 0.5
-                },
-                MaxTokenAppearance = n => (int) Math.Sqrt(n)
-            });
+            var watch       = new Stopwatch();
+            var treeMatcher = new SftmTreeMatcher(_parameters);
 
             var source = File.ReadAllText("websites/linkedin.html");
             var target = File.ReadAllText("websites/linkedin_mutant.html");

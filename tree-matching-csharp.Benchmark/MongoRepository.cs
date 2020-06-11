@@ -12,10 +12,10 @@ namespace tree_matching_csharp.Benchmark
     {
         private static   MongoRepository              _instance;
         private readonly IMongoCollection<DOMVersion> _mutationCollection;
-        private readonly IMongoCollection<SimulationResult> _simulationResultsCollection;
+        private readonly IMongoCollection<SimulationResultMutation> _simulationResultsCollection;
 
 
-        private MongoRepository(IMongoCollection<DOMVersion> mutationCollection, IMongoCollection<SimulationResult> simulationResultsCollection)
+        private MongoRepository(IMongoCollection<DOMVersion> mutationCollection, IMongoCollection<SimulationResultMutation> simulationResultsCollection)
         {
             _mutationCollection = mutationCollection;
             _simulationResultsCollection = simulationResultsCollection;
@@ -32,18 +32,18 @@ namespace tree_matching_csharp.Benchmark
             ConventionRegistry.Register("camel case", pack, t => true);
 
             var mutationCollection = database.GetCollection<DOMVersion>(Settings.Mongo.MutationCollection);
-            var simulationResultCollection = database.GetCollection<SimulationResult>(Settings.Mongo.ResultCollection);
-            await simulationResultCollection.Indexes?.CreateOneAsync(Builders<SimulationResult>.IndexKeys.Ascending(s => s.Label));
-            await simulationResultCollection.Indexes?.CreateOneAsync(Builders<SimulationResult>.IndexKeys.Ascending(s => s.OriginalId));
-            await simulationResultCollection.Indexes?.CreateOneAsync(Builders<SimulationResult>.IndexKeys.Ascending(s => s.MutantId));
+            var simulationResultCollection = database.GetCollection<SimulationResultMutation>(Settings.Mongo.ResultCollection);
+            await simulationResultCollection.Indexes?.CreateOneAsync(Builders<SimulationResultMutation>.IndexKeys.Ascending(s => s.Label));
+            await simulationResultCollection.Indexes?.CreateOneAsync(Builders<SimulationResultMutation>.IndexKeys.Ascending(s => s.OriginalId));
+            await simulationResultCollection.Indexes?.CreateOneAsync(Builders<SimulationResultMutation>.IndexKeys.Ascending(s => s.MutantId));
             _instance = new MongoRepository(mutationCollection, simulationResultCollection);
 
             return _instance;
         }
 
-        public void SaveResults(SimulationResult result)
+        public void SaveResults(SimulationResultMutation resultMutation)
         {
-            _simulationResultsCollection.InsertOne(result);
+            _simulationResultsCollection.InsertOne(resultMutation);
         }
 
         public async Task<bool> MeasureAlreadyExists(string label, string mutantId)

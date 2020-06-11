@@ -1,10 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp3.0</TargetFramework>
         <RootNamespace>tree_matching_csharp.Benchmark</RootNamespace>
     </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="bracketParser\Bracket.peg" />
+      <None Update="data\bolzano\L.trees">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="data\bolzano\R.trees">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="HttpClientExtensions" Version="1.0.3" />
@@ -14,7 +24,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PegGrammar Include="bracketParser\Bracket.peg" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\tree-matching-csharp\tree-matching-csharp.csproj" />
     </ItemGroup>
+
 
 </Project>

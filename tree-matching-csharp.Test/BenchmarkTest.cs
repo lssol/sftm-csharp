@@ -27,5 +27,21 @@ namespace tree_matching_csharp.Test
             if (res.Edges.Any(m => m.Source != m.Target))
                 Assert.Fail();
         }
+
+        [Test]
+        public void TestBracketParser()
+        {
+            var bracketTree = "{cesare abba strasse{1}{2}{3{{1}{3}}}{11}}";
+            var parser = new PegParser.BracketParser();
+            var tree = parser.Parse(bracketTree);
+            Assert.True(tree != null);
+            Assert.True(tree.Children.Count() == 4);
+        }
+        [Test]
+        public void TestBolzano()
+        {
+            var trees = BolzanoImporter.GetBolzanoTrees();
+            Assert.True(trees.Any());
+        }
     }
 }

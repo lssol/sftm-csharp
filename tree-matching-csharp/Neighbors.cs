@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -37,7 +38,8 @@ namespace tree_matching_csharp
                 {
                     Source = sourceNode,
                     Target = targetNode,
-                    Cost = 1 / (1 + score)
+                    Cost = 1 / (1 + score),
+                    Score = score
                 });
             }
         }

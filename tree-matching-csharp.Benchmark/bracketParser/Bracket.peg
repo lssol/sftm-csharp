@@ -1,0 +1,6 @@
+﻿@namespace PegParser
+@classname BracketParser
+@using tree_matching_csharp.Benchmark.BracketParser
+
+Tree <BracketTree> = "{" label:Label children:Tree* "}" {new BracketTree {Label = string.Join("", label), Children = children}}
+Label = [^{^}]*

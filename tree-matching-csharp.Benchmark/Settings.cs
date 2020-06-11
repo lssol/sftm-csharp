@@ -17,23 +17,25 @@ namespace tree_matching_csharp.Benchmark
 
         public static readonly SftmTreeMatcher.Parameters SFTMParameters = new SftmTreeMatcher.Parameters
         {
-            LimitNeighbors = 20,
+            LimitNeighbors = 2000,
             MetropolisParameters = new Metropolis.Parameters
             {
-                Gamma        = 1f,
-                Lambda       = 0.7f,
-                NbIterations = 20,
+                Gamma        = 0.657f, // MUST be < 1
+                Lambda       = 2.5f,
+                NbIterations = 100,
             },
-            NoMatchCost = 0.2,
+            NoMatchCost = 0.15,
             PropagationParameters = new SimilarityPropagation.Parameters()
             {
-                Envelop    = new[] {0.7, 0.08},
-                Parent     = 0.2,
-                Sibling    = 0.1,
-                SiblingInv = 0.1,
-                ParentInv  = 0.6
+                Envelop    = new[] {8, 3.0, 0.3, 0.22, 0.11},
+                // Envelop    = new[] {0.0},
+                Parent     = 1.8,
+                Sibling    = 0.3,
+                SiblingInv = 0.5,
+                ParentInv  = 0.9
             },
-            MaxTokenAppearance = n => (int) Math.Sqrt(n)
+            // MaxTokenAppearance = n => (int) Math.Sqrt(n)
+            MaxTokenAppearance = n => n
         };
 
         public const string UrlRTED = "http://163.172.16.184:7040";

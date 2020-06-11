@@ -36,7 +36,7 @@ namespace tree_matching_csharp
             _params          = parameters;
             _nbNodes         = nbNodes;
             _maxNeighbors    = maxNeighbors;
-            _edges           = edges.OrderBy(edge => edge.Cost).ToList();
+            _edges           = edges.OrderByDescending(edge => edge.Score).ToList();
             _linkedListNodes = new Dictionary<Edge, LinkedListNode<Edge>>(_edges.Count());
             _nodeToEdges     = ComputeNodeToEdgesDic();
             _rand            = new Random();
@@ -111,8 +111,8 @@ namespace tree_matching_csharp
         }
         private double ComputeObjective(IEnumerable<Edge> matching)
         {
-            var cost = matching.Average(e => e.Cost);
-            return Math.Exp(-_params.Lambda * cost / matching.Count());
+            var cost = matching.Sum(e => e.Score);
+            return Math.Exp(-_params.Lambda * cost);
         }
 
         private List<Edge> SuggestMatching(List<Edge> previousMatching)
