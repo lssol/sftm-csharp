@@ -9,6 +9,7 @@ namespace tree_matching_csharp
         public Node   Source;
         public Node   Target;
         public double Cost;
+        public double NormalizedScore;
         public double Score { get; set; }
     }
 

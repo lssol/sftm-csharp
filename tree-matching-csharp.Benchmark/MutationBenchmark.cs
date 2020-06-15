@@ -50,13 +50,15 @@ namespace tree_matching_csharp.Benchmark
                 Console.WriteLine($"Different values, targets = {targets.Count()} and targetsFromEdge = {targetsFromEdges.Count()}");
         }
 
-        public static async IAsyncEnumerable<SimulationResultBracket> RunBracket(string label, ITreeMatcher matcher, string dataset)
+        public static async IAsyncEnumerable<(IEnumerable<Node> source, IEnumerable<Node> target, SimulationResultBracket)> RunBracket(string label, ITreeMatcher matcher, string dataset)
         {
             foreach (var (key, source, target) in BolzanoImporter.GetBolzanoTrees())
             {
                 TreeMatcherResponse resultMatching;
                 try
                 {
+                    RtedTreeMatcher.ComputeChildren(source);
+                    RtedTreeMatcher.ComputeChildren(target);
                     resultMatching = await matcher.MatchTrees(source, target);
                 }
                 catch (Exception e)
@@ -71,7 +73,7 @@ namespace tree_matching_csharp.Benchmark
                 var ftmCost = new FTMCost(resultMatching.Edges).ComputeCost();
                 CheckMatchingIsComplete(resultMatching.Edges, source, target);
                 var ftmRelativeCost = (ftmCost.Ancestry + ftmCost.Relabel + ftmCost.Sibling + ftmCost.NoMatch) / maxTotal;
-                yield return new SimulationResultBracket
+                yield return (source, target, new SimulationResultBracket
                 {
                     Dataset = dataset,
                     Id = key,
@@ -82,7 +84,7 @@ namespace tree_matching_csharp.Benchmark
                     NoMatch = resultMatching.Edges.Count(e => e.Source == null || e.Target == null),
                     FTMCost = ftmCost,
                     FTMRelativeCost = ftmRelativeCost
-                };
+                });
             }
         }
         

@@ -86,7 +86,7 @@ namespace tree_matching_csharp.Benchmark
             };
         }
 
-        private void ComputeChildren(IEnumerable<Node> nodes) => nodes.ForEach(n => n.Parent?.Children.Add(n));
+        public static void ComputeChildren(IEnumerable<Node> nodes) => nodes.ForEach(n => n.Parent?.Children.Add(n));
 
         private Node GetRoot(IEnumerable<Node> nodes) => nodes.First(n => n.Parent == null);
 

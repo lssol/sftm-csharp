@@ -35,8 +35,17 @@ namespace tree_matching_csharp.Benchmark
             var sibling = new List<double>();
             const int maxLoops = 40;
             var i = 0;
-            await foreach (var result in results)
+            await foreach (var (source, target, result) in results)
             {
+                // Console.WriteLine("###################################");
+                // Console.WriteLine("New trees");
+                // Console.WriteLine("###################################");
+                // // Console.WriteLine("-------- SOURCE");
+                // RtedTreeMatcher.ComputeChildren(source);
+                // // Console.WriteLine("-------- TARGET");
+                // RtedTreeMatcher.ComputeChildren(target);
+                // PrintTree(source.First(s => s.Parent == null), "", true);
+                // PrintTree(target.First(s => s.Parent == null), "", true);
                 if (i == maxLoops)
                     break;
                 costs.Add(result.FTMRelativeCost);
@@ -54,14 +63,25 @@ namespace tree_matching_csharp.Benchmark
         }
         
 
+        public static void PrintTree(Node tree, String indent, bool last)
+        {
+            Console.WriteLine($"{indent}+-[{string.Join("", tree.Id.ToString().Take(3))}] {string.Join(" ", tree.Value)}");
+            indent += last ? "   " : "|  ";
+
+            for (int i = 0; i < tree.Children.Count; i++)
+            {
+                PrintTree(tree.Children[i], indent, i == tree.Children.Count - 1);
+            }
+        }
+        
         static async Task Main(string[] args)
         {
             var sftm = new SftmTreeMatcher(Settings.SFTMParameters);
             var rted = new RtedTreeMatcher(Settings.RTEDParameters);
             
             // BOLZANO
-            // await RunAndSaveBracket("SFTM", sftm);
-            await RunAndSaveBracket("RTED", rted);
+            await RunAndSaveBracket("SFTM", sftm);
+            // await RunAndSaveBracket("RTED", rted);
 
             // await RunAndSaveMutation("SFTM2", sftm);
             // MUTATION

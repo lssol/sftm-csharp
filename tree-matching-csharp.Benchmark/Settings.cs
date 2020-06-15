@@ -20,18 +20,20 @@ namespace tree_matching_csharp.Benchmark
             LimitNeighbors = 2000,
             MetropolisParameters = new Metropolis.Parameters
             {
-                Gamma        = 0.657f, // MUST be < 1
+                Gamma        = 0.8f, // MUST be < 1
                 Lambda       = 2.5f,
                 NbIterations = 100,
             },
             NoMatchCost = 0.15,
-            PropagationParameters = new SimilarityPropagation.Parameters()
+            MaxPenalizationChildren = 0.5,
+            MaxPenalizationParentsChildren = 0.2,
+            PropagationParameters = new SimilarityPropagation.Parameters
             {
-                Envelop    = new[] {8, 3.0, 0.3, 0.22, 0.11},
+                Envelop    = new[] {7.9, 2.8, 0.1, 0.05, 0.01},
                 // Envelop    = new[] {0.0},
-                Parent     = 1.8,
-                Sibling    = 0.3,
-                SiblingInv = 0.5,
+                Parent     = 0.8,
+                Sibling    = 0.1,
+                SiblingInv = 0.05,
                 ParentInv  = 0.9
             },
             // MaxTokenAppearance = n => (int) Math.Sqrt(n)

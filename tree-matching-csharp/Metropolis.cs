@@ -29,21 +29,21 @@ namespace tree_matching_csharp
         private List<Edge> _newMatching;
         private LinkedList<Edge> _linkedEdges;
         private HashSet<Edge> _adjacentEdges;
-        private Dictionary<Edge, List<Edge>> _inMemoryAdjacentEdges;
 
         public Metropolis(Parameters parameters, IEnumerable<Edge> edges, int nbNodes, int maxNeighbors)
         {
             _params          = parameters;
             _nbNodes         = nbNodes;
             _maxNeighbors    = maxNeighbors;
-            _edges           = edges.OrderByDescending(edge => edge.Score).ToList();
-            _linkedListNodes = new Dictionary<Edge, LinkedListNode<Edge>>(_edges.Count());
+            _adjacentEdges = new HashSet<Edge>(_maxNeighbors *2);
+            _edges = edges.ToList();
             _nodeToEdges     = ComputeNodeToEdgesDic();
+            ComputeAdjacentPenalization();
+            _edges           = _edges.OrderByDescending(edge => edge.NormalizedScore).ToList();
+            _linkedListNodes = new Dictionary<Edge, LinkedListNode<Edge>>(_edges.Count());
             _rand            = new Random();
             _newMatching = new List<Edge>(_nbNodes + 10);
             _linkedEdges = new LinkedList<Edge>();
-            _adjacentEdges = new HashSet<Edge>(_maxNeighbors *2);
-            // _inMemoryAdjacentEdges = PreComputeAdjacentEdges();
         }
 
         public List<Edge> Run()
@@ -67,13 +67,28 @@ namespace tree_matching_csharp
                 bestMatching = currentMatching;
             }
 
+
+            // var ftmCost = new FTMCost(bestMatching).ComputeCost();
+            // Console.WriteLine($"Best Objective: {maxObjective}");
+            // Console.WriteLine($"FTM: {ftmCost.Ancestry+ftmCost.Sibling+ftmCost.Relabel+ftmCost.NoMatch}: anc {ftmCost.Ancestry}, sib: {ftmCost.Sibling}, rel: {ftmCost.Relabel}, nom: {ftmCost.NoMatch}");
             return bestMatching;
+        }
+
+
+        private void ComputeAdjacentPenalization()
+        {
+            foreach (var edge in _edges)
+            {
+                var adjacentEdges = GetAdjacentEdges(edge);
+                var sumScores     = adjacentEdges.Sum(adjacentEdge => adjacentEdge.Score) + edge.Score;
+                edge.NormalizedScore = edge.Score / sumScores;
+            }
         }
 
         private Dictionary<Node, HashSet<Edge>> ComputeNodeToEdgesDic()
         {
             var nodeToEdges = new Dictionary<Node, HashSet<Edge>>(_nbNodes + 10);
-            _edges.ForEach(e =>
+            MoreEnumerable.ForEach(_edges, e =>
             {
                 if (e.Source == null)
                     nodeToEdges.PushAt(e.Target, e);
@@ -94,25 +109,14 @@ namespace tree_matching_csharp
             if (edge.Target != null)
                 _adjacentEdges.UnionWith(_nodeToEdges[edge.Target]);
 
+            _adjacentEdges.Remove(edge);
             return new List<Edge>(_adjacentEdges);
         }
 
-        private Dictionary<Edge, List<Edge>> PreComputeAdjacentEdges()
-        {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            var adjacentEdges = new Dictionary<Edge, List<Edge>>(_edges.Count());
-            foreach (var edge in _edges)
-                adjacentEdges.Add(edge, GetAdjacentEdges(edge));
-
-            stopwatch.Stop();
-            Console.WriteLine($"Precomputing the edges took: {stopwatch.ElapsedMilliseconds}");
-            return adjacentEdges;
-        }
         private double ComputeObjective(IEnumerable<Edge> matching)
         {
-            var cost = matching.Sum(e => e.Score);
-            return Math.Exp(-_params.Lambda * cost);
+            var score = matching.Average(e => e.NormalizedScore);
+            return score;
         }
 
         private List<Edge> SuggestMatching(List<Edge> previousMatching)
@@ -128,6 +132,7 @@ namespace tree_matching_csharp
                 _newMatching.Add(edge);
                 var adjacentEdges = GetAdjacentEdges(edge); // _inMemoryAdjacentEdges[edge];
                 foreach (var e in adjacentEdges) _linkedEdges.RemoveIfExist(_linkedListNodes[e]);
+                _linkedEdges.Remove(_linkedListNodes[edge]);
             }
 
             var p = _rand.Next(0, previousMatching.Count);

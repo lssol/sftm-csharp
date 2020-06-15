@@ -17,6 +17,8 @@ namespace tree_matching_csharp
             public double                           NoMatchCost           { get; set; }
             public int                              LimitNeighbors        { get; set; }
             public Func<int, int>                   MaxTokenAppearance    { get; set; }
+            public double MaxPenalizationChildren { get; set; }
+            public double MaxPenalizationParentsChildren { get; set; }
         }
 
 
@@ -27,11 +29,36 @@ namespace tree_matching_csharp
             _param = param;
         }
 
+        private void ComputeChildrenPenalization(Neighbors neighbors, IEnumerable<Node> nodes)
+        {
+            var edges = neighbors.ToEdges();
+            var averageChildrenCount = nodes.Average(n => n.Children.Count);
+
+            double ComputeRatioChildren(int cT, int cS, double maxPenalization)
+            {
+                var ratioChildren = Math.Abs(cS - cT) / averageChildrenCount;
+                var cappedRatio = Math.Max(1, ratioChildren);
+                return cappedRatio * maxPenalization;
+            }
+            
+            foreach (var edge in edges)
+            {
+                var cT = edge.Target.Children.Count;
+                var cS = edge.Target.Children.Count;
+
+                var cpT = edge.Target.Parent?.Children?.Count ?? 0;
+                var cpS = edge.Target.Parent?.Children?.Count ?? 0;
+                
+                neighbors.Value[edge.Target][edge.Source] = neighbors.Value[edge.Target][edge.Source] * (1 -  
+                                                            ComputeRatioChildren(cT, cS, _param.MaxPenalizationChildren) -
+                                                            ComputeRatioChildren(cpT, cpS, _param.MaxPenalizationParentsChildren));
+            }
+        }
 
         private IEnumerable<Edge> GetNoMatchEdges(IEnumerable<Node> sourceNodes, IEnumerable<Node> targetNodes)
         {
-            var edgesFromSource = sourceNodes.Select(n => new Edge {Cost = _param.NoMatchCost, Source = n, Target    = null});
-            var edgesFromTarget = targetNodes.Select(n => new Edge {Cost = _param.NoMatchCost, Source = null, Target = n});
+            var edgesFromSource = sourceNodes.Select(n => new Edge {Score = 1/_param.NoMatchCost, Cost = _param.NoMatchCost, Source = n, Target    = null});
+            var edgesFromTarget = targetNodes.Select(n => new Edge {Score = 1/_param.NoMatchCost, Cost = _param.NoMatchCost, Source = null, Target = n});
 
             return edgesFromSource.Concat(edgesFromTarget);
         }
@@ -44,10 +71,11 @@ namespace tree_matching_csharp
             var indexer = new InMemoryIndexer(_param.LimitNeighbors, _param.MaxTokenAppearance(sourceNodes.Count()));
 
             var neighbors = indexer.FindNeighbors(sourceNodes, targetNodes);
+            ComputeChildrenPenalization(neighbors, sourceNodes.Concat(targetNodes));
             _param.PropagationParameters.Envelop.ForEach(envelop => { neighbors = SimilarityPropagation.PropagateSimilarity(neighbors, _param.PropagationParameters, envelop); });
 
             var noMatchEdges = GetNoMatchEdges(sourceNodes, targetNodes);
-            var edges        = neighbors.GetEdges().Concat(noMatchEdges);
+            var edges        = neighbors.ToEdges().Concat(noMatchEdges);
             var metropolis   = new Metropolis(_param.MetropolisParameters, edges, sourceNodes.Count() + targetNodes.Count(), _param.LimitNeighbors);
 
             var matchingEdges = metropolis.Run();

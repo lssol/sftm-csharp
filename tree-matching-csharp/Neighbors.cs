@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,7 +9,6 @@ namespace tree_matching_csharp
     public class Neighbors
     {
         public  Dictionary<Node, Dictionary<Node, double>> Value;
-        private IList<Edge>           _edges;
 
         public Neighbors()
         {
@@ -19,22 +19,14 @@ namespace tree_matching_csharp
 
         public double Score(Node sourceNode, Node targetNode) => (Get(targetNode)?.ContainsKey(sourceNode) ?? false) ? Value[targetNode][sourceNode] : 0;
 
-        public IEnumerable<Edge> GetEdges()
+        public IEnumerable<Edge> ToEdges()
         {
-            if (_edges == null)
-                NeighborsToEdges();
-            
-            return _edges;
-        }
-
-        private void NeighborsToEdges()
-        {
-            _edges = new List<Edge>();
+            var edges = new List<Edge>();
             
             foreach (var (targetNode, hits) in Value)
             foreach (var (sourceNode, score) in hits)
             {
-                _edges.Add(new Edge
+                edges.Add(new Edge
                 {
                     Source = sourceNode,
                     Target = targetNode,
@@ -42,6 +34,8 @@ namespace tree_matching_csharp
                     Score = score
                 });
             }
+
+            return edges;
         }
     }
 }
