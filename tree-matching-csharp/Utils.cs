@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MoreLinq.Extensions;
 
 namespace tree_matching_csharp
 {
@@ -35,5 +36,7 @@ namespace tree_matching_csharp
             
             return self;
         }
+        
+        public static void ComputeChildren(this IEnumerable<Node> nodes) => nodes.ForEach(n => n.Parent?.Children.Add(n));
     }
 }

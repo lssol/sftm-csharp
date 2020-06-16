@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using MongoDB.Bson;
 
 namespace tree_matching_csharp.Benchmark
@@ -17,7 +18,7 @@ namespace tree_matching_csharp.Benchmark
         public int                     Mismatch           { get; set; }
         public int                     NbMutationsMade    { get; set; }
         public Dictionary<string, int> MutationsMade      { get; set; }
-        public FTMCost.Cost            FTMCost            { get; set; }
+        public FtmCost.Cost            FTMCost            { get; set; }
     }
 
     public class SimulationResultBracket
@@ -27,9 +28,10 @@ namespace tree_matching_csharp.Benchmark
         public long         ComputationTime { get; set; }
         public string       MatcherLabel    { get; set; }
         public int          NoMatch         { get; set; }
-        public FTMCost.Cost FTMCost         { get; set; }
+        public FtmCost.Cost FTMCost         { get; set; }
         public int TotalSource { get; set; }
         public int TotalTarget { get; set; }
         public double FTMRelativeCost { get; set; }
+        public IEnumerable<Edge> Matching { get; set; }
     }
 }

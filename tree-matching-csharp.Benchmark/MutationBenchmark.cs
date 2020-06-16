@@ -57,8 +57,6 @@ namespace tree_matching_csharp.Benchmark
                 TreeMatcherResponse resultMatching;
                 try
                 {
-                    RtedTreeMatcher.ComputeChildren(source);
-                    RtedTreeMatcher.ComputeChildren(target);
                     resultMatching = await matcher.MatchTrees(source, target);
                 }
                 catch (Exception e)
@@ -70,7 +68,7 @@ namespace tree_matching_csharp.Benchmark
                     continue;
 
                 var maxTotal = Math.Max(source.Count(), target.Count());
-                var ftmCost = new FTMCost(resultMatching.Edges).ComputeCost();
+                var ftmCost = new FtmCost(resultMatching.Edges).ComputeCost();
                 CheckMatchingIsComplete(resultMatching.Edges, source, target);
                 var ftmRelativeCost = (ftmCost.Ancestry + ftmCost.Relabel + ftmCost.Sibling + ftmCost.NoMatch) / maxTotal;
                 yield return (source, target, new SimulationResultBracket
@@ -83,14 +81,15 @@ namespace tree_matching_csharp.Benchmark
                     MatcherLabel = label,
                     NoMatch = resultMatching.Edges.Count(e => e.Source == null || e.Target == null),
                     FTMCost = ftmCost,
-                    FTMRelativeCost = ftmRelativeCost
+                    FTMRelativeCost = ftmRelativeCost,
+                    Matching = resultMatching.Edges
                 });
             }
         }
         
         private static SimulationResultMutation ToSimulationResult(WebsiteMatcher.Result result, MutationCouple mutationCouple, string label)
         {
-            var ftmCostComputer = new FTMCost(result.Matching);
+            var ftmCostComputer = new FtmCost(result.Matching);
             return new SimulationResultMutation
             {
                 Mismatch           = result.NbMismatch,

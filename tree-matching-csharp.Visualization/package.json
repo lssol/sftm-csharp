@@ -1,0 +1,17 @@
+{
+  "name": "tree-matching-csharp.Visualization",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cytoscape": "^3.15.1",
+    "cytoscape-dagre": "^2.2.2"
+  }
+}

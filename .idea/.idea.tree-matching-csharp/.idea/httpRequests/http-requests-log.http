@@ -1,0 +1,43 @@
+GET http://localhost:4678/bolzano/
+Accept: application/json
+
+<> 2020-06-15T093337.200.json
+
+###
+
+GET http://localhost:4678/bolzano/
+Accept: application/json
+
+<> 2020-06-15T092939.500.html
+
+###
+
+GET http://localhost:4678/bolzano/
+Accept: application/json
+
+<> 2020-06-15T092843.500.html
+
+###
+
+GET http://localhost:4678/bolzano/
+Accept: application/json
+
+<> 2020-06-15T092645.500.html
+
+###
+
+GET http://localhost:4678/api/bolzano/
+Accept: application/json
+
+###
+
+GET http://localhost:80/api/bolzano/
+Accept: application/json
+
+###
+
+GET http://localhost:80/api/bolzano/
+Accept: application/json
+
+###
+

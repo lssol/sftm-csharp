@@ -2,7 +2,13 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<div id="cy"></div>
+
+@section Scripts
+{
+    <script src="~/lib/cytoscape.min.js"></script>
+    <script src="~/lib/dagre.js"></script>
+    <script src="~/lib/cytoscape-dagre.js"></script>
+    <script src="~/lib/axios.min.js"></script>
+    <script src='~/js/visualization.js'></script>
+}

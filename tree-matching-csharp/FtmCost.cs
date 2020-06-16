@@ -6,7 +6,7 @@ using MoreLinq.Extensions;
 
 namespace tree_matching_csharp
 {
-    public class FTMCost
+    public class FtmCost
     {
         public class Cost
         {
@@ -18,6 +18,8 @@ namespace tree_matching_csharp
                 NoMatch  = noMatch;
             }
 
+            public double Total => Relabel + Ancestry + Sibling + NoMatch;
+
             public double Relabel  { get; set; }
             public double Ancestry { get; set; }
             public double Sibling  { get; set; }
@@ -28,7 +30,7 @@ namespace tree_matching_csharp
         private readonly Dictionary<Node, Node>          _matchingDic;
         private readonly Dictionary<Node, HashSet<Node>> _childrenDic;
 
-        public FTMCost(IEnumerable<Edge> matching)
+        public FtmCost(IEnumerable<Edge> matching)
         {
             _matching    = matching;
             _matchingDic = ComputeMatchingDic(matching);
@@ -39,7 +41,12 @@ namespace tree_matching_csharp
 
         public Cost ComputeCost()
         {
-            var edgeCosts = _matching.Select(ComputeCost);
+            var edgeCosts = _matching.Select(e =>
+            {
+                e.FtmCost = ComputeCost(e);
+                return e.FtmCost;
+            });
+            
             return new Cost
             {
                 Ancestry = edgeCosts.Select(c => c.Ancestry).Sum(),

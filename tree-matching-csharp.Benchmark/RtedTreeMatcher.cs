@@ -51,8 +51,8 @@ namespace tree_matching_csharp.Benchmark
 
         public async Task<TreeMatcherResponse> MatchTrees(IEnumerable<Node> sourceNodes, IEnumerable<Node> targetNodes)
         {
-            ComputeChildren(sourceNodes);
-            ComputeChildren(targetNodes);
+            sourceNodes.ComputeChildren();
+            targetNodes.ComputeChildren();
 
             var sourceRoot = GetRoot(sourceNodes);
             var targetRoot = GetRoot(targetNodes);
@@ -85,8 +85,6 @@ namespace tree_matching_csharp.Benchmark
                 }).Where(e => e.Source != null || e.Target != null)
             };
         }
-
-        public static void ComputeChildren(IEnumerable<Node> nodes) => nodes.ForEach(n => n.Parent?.Children.Add(n));
 
         private Node GetRoot(IEnumerable<Node> nodes) => nodes.First(n => n.Parent == null);
 

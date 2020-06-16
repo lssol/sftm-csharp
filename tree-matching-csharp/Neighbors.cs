@@ -30,7 +30,6 @@ namespace tree_matching_csharp
                 {
                     Source = sourceNode,
                     Target = targetNode,
-                    Cost = 1 / (1 + score),
                     Score = score
                 });
             }

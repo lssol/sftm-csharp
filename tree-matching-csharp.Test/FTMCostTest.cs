@@ -20,7 +20,7 @@ namespace tree_matching_csharp.Test
 
             var websiteMatcher = new WebsiteMatcher(treeMatcher);
             var matching = await websiteMatcher.MatchWebsites(source, target);
-            var cost = new FTMCost(matching.Matching).ComputeCost();
+            var cost = new FtmCost(matching.Matching).ComputeCost();
             
             Console.WriteLine(cost.ToJson());
             

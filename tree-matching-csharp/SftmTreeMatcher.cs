@@ -57,8 +57,8 @@ namespace tree_matching_csharp
 
         private IEnumerable<Edge> GetNoMatchEdges(IEnumerable<Node> sourceNodes, IEnumerable<Node> targetNodes)
         {
-            var edgesFromSource = sourceNodes.Select(n => new Edge {Score = 1/_param.NoMatchCost, Cost = _param.NoMatchCost, Source = n, Target    = null});
-            var edgesFromTarget = targetNodes.Select(n => new Edge {Score = 1/_param.NoMatchCost, Cost = _param.NoMatchCost, Source = null, Target = n});
+            var edgesFromSource = sourceNodes.Select(n => new Edge {Score = 1/_param.NoMatchCost, Source = n, Target    = null});
+            var edgesFromTarget = targetNodes.Select(n => new Edge {Score = 1/_param.NoMatchCost, Source = null, Target = n});
 
             return edgesFromSource.Concat(edgesFromTarget);
         }
@@ -66,8 +66,10 @@ namespace tree_matching_csharp
         public Task<TreeMatcherResponse> MatchTrees(IEnumerable<Node> sourceNodes, IEnumerable<Node> targetNodes)
         {
             var watch = new Stopwatch();
-            
             watch.Start();
+            sourceNodes.ComputeChildren();
+            sourceNodes.ComputeChildren();
+            
             var indexer = new InMemoryIndexer(_param.LimitNeighbors, _param.MaxTokenAppearance(sourceNodes.Count()));
 
             var neighbors = indexer.FindNeighbors(sourceNodes, targetNodes);
