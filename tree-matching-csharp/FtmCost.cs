@@ -30,7 +30,7 @@ namespace tree_matching_csharp
         private readonly Dictionary<Node, Node>          _matchingDic;
         private readonly Dictionary<Node, HashSet<Node>> _childrenDic;
 
-        public FtmCost(IEnumerable<Edge> matching)
+        public FtmCost(List<Edge> matching)
         {
             _matching    = matching;
             _matchingDic = ComputeMatchingDic(matching);
@@ -39,20 +39,21 @@ namespace tree_matching_csharp
             _childrenDic = ComputeChildrenDic(nodes);
         }
 
+        
         public Cost ComputeCost()
         {
-            var edgeCosts = _matching.Select(e =>
+            foreach (var edge in _matching)
             {
-                e.FtmCost = ComputeCost(e);
-                return e.FtmCost;
-            });
+                var cost = ComputeCost(edge);
+                edge.FtmCost = cost;
+            }
             
             return new Cost
             {
-                Ancestry = edgeCosts.Select(c => c.Ancestry).Sum(),
-                Relabel  = edgeCosts.Select(c => c.Relabel).Sum(),
-                Sibling  = edgeCosts.Select(c => c.Sibling).Sum(),
-                NoMatch  = edgeCosts.Select(c => c.NoMatch).Sum(),
+                Ancestry = _matching.Select(c => c.FtmCost.Ancestry).Sum(),
+                Relabel  = _matching.Select(c => c.FtmCost.Relabel).Sum(),
+                Sibling  = _matching.Select(c => c.FtmCost.Sibling).Sum(),
+                NoMatch  = _matching.Select(c => c.FtmCost.NoMatch).Sum(),
             };
         }
 

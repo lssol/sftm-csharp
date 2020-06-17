@@ -33,7 +33,8 @@ namespace tree_matching_csharp.Visualization.Models
         }
 
         public double Time     { get; set; }
-        public double Cost  { get; set; }
+        public FtmCost.Cost Cost  { get; set; }
         public IEnumerable<Match>  Matches { get; set; }
+        public double RelativeCost { get; set; }
     }
 }

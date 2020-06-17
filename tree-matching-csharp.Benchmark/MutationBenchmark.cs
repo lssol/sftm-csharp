@@ -68,7 +68,8 @@ namespace tree_matching_csharp.Benchmark
                     continue;
 
                 var maxTotal = Math.Max(source.Count(), target.Count());
-                var ftmCost = new FtmCost(resultMatching.Edges).ComputeCost();
+                var edges = resultMatching.Edges.ToList();
+                var ftmCost = new FtmCost(edges).ComputeCost();
                 CheckMatchingIsComplete(resultMatching.Edges, source, target);
                 var ftmRelativeCost = (ftmCost.Ancestry + ftmCost.Relabel + ftmCost.Sibling + ftmCost.NoMatch) / maxTotal;
                 yield return (source, target, new SimulationResultBracket
@@ -89,7 +90,7 @@ namespace tree_matching_csharp.Benchmark
         
         private static SimulationResultMutation ToSimulationResult(WebsiteMatcher.Result result, MutationCouple mutationCouple, string label)
         {
-            var ftmCostComputer = new FtmCost(result.Matching);
+            var ftmCostComputer = new FtmCost(result.Matching.ToList());
             return new SimulationResultMutation
             {
                 Mismatch           = result.NbMismatch,

@@ -15,37 +15,42 @@ namespace tree_matching_csharp.Visualization.Controllers
     public class Bolzano : ControllerBase
     {
         private readonly ILogger<Bolzano> _logger;
-        private IAsyncEnumerator<(IEnumerable<Node> source, IEnumerable<Node> target, SimulationResultBracket)> _mutationGeneratorSFTM;
-        private IAsyncEnumerator<(IEnumerable<Node> source, IEnumerable<Node> target, SimulationResultBracket)> _mutationGeneratorRTED;
 
         public Bolzano(ILogger<Bolzano> logger)
         {
-            var sftm = new SftmTreeMatcher(Settings.SFTMParameters);
-            var rted = new RtedTreeMatcher(Settings.RTEDParameters);
-            
-            _mutationGeneratorSFTM = MutationBenchmark.RunBracket("SFTM", sftm, "bolzano").GetAsyncEnumerator();
-            _mutationGeneratorRTED = MutationBenchmark.RunBracket("RTED", rted, "bolzano").GetAsyncEnumerator();
-            
             _logger = logger;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<TreeVizResult>> Get()
+        private ITreeMatcher GetMatcher(string matcher) => matcher switch
         {
-            await _mutationGeneratorSFTM.MoveNextAsync();
-            var (source, target, res) = _mutationGeneratorSFTM.Current;
+            "sftm" => new SftmTreeMatcher(Settings.SFTMParameters),
+            "rted" => new RtedTreeMatcher(Settings.RTEDParameters),
+            _      => throw new Exception("Unknown Matcher")
+        };
+
+        [HttpGet]
+        public async Task<ActionResult<TreeVizResult>> Get(int index, string matcherName)
+        {
+            var matcher = GetMatcher(matcherName);
+            var (key, source, target) = BolzanoImporter.GetBolzanoTrees().Skip(index).First();
+            var resultMatching = await matcher.MatchTrees(source, target);
+            var maxTotal       = Math.Max(source.Count(), target.Count());
+            var edges = resultMatching.Edges.ToList();
+            var ftmCost        = new FtmCost(edges).ComputeCost();
+            var ftmRelativeCost = (ftmCost.Ancestry + ftmCost.Relabel + ftmCost.Sibling + ftmCost.NoMatch) / maxTotal;
             return new TreeVizResult
             {
                 Tree1 = source.Select(n => n.ToCyto()),
                 Tree2 = target.Select(n => n.ToCyto()),
                 Matching = new Matching
                 {
-                    Time = res.ComputationTime,
-                    Cost = res.FTMRelativeCost,
-                    Matches = res.Matching.Select(edge => new Matching.Match
+                    Time = resultMatching.ComputationTime,
+                    Cost = ftmCost,
+                    RelativeCost = ftmRelativeCost,
+                    Matches = edges.Select(edge => new Matching.Match
                     {
-                        Id1 = edge.Source?.Id.ToString(),
-                        Id2 = edge.Target?.Id.ToString(),
+                        Id1  = edge.Source?.Id.ToString(),
+                        Id2  = edge.Target?.Id.ToString(),
                         Cost = edge.FtmCost
                     })
                 }

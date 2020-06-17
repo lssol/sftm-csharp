@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using NUnit.Framework;
@@ -20,7 +21,7 @@ namespace tree_matching_csharp.Test
 
             var websiteMatcher = new WebsiteMatcher(treeMatcher);
             var matching = await websiteMatcher.MatchWebsites(source, target);
-            var cost = new FtmCost(matching.Matching).ComputeCost();
+            var cost = new FtmCost(matching.Matching.ToList()).ComputeCost();
             
             Console.WriteLine(cost.ToJson());
             
