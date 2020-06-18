@@ -25,7 +25,7 @@ namespace tree_matching_csharp
             return value;
         }
 
-        private static IList<string> TokenizeNode(IElement el)
+        private static List<string> TokenizeNode(IElement el)
         {
             var tokens = new List<string> {el.TagName};
             foreach (var attr in el.Attributes)

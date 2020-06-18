@@ -28,11 +28,12 @@ namespace tree_matching_csharp.Test
                 "node",
                 "fox"
             };
-            var sourceNodes = sourceList.Select(s => new Node { Value = s.Split(" ")}).ToArray();
-            var targetNodes = targetList.Select(s => new Node { Value = s.Split(" ")}).ToArray();
+            var sourceNodes = sourceList.Select(s => new Node { Value = s.Split(" ").ToList()}).ToArray();
+            var targetNodes = targetList.Select(s => new Node { Value = s.Split(" ").ToList()}).ToArray();
             
             var indexer = new InMemoryIndexer(10, 10);
-            var neighbors = indexer.FindNeighbors(sourceNodes, targetNodes);
+            var index = indexer.BuildIndex(sourceNodes);
+            var neighbors = indexer.FindNeighbors(index, targetNodes);
             
             if (neighbors.Value.Count == 0)
                 Assert.Fail();
@@ -51,7 +52,8 @@ namespace tree_matching_csharp.Test
             var webpage = DomTests.SimpleWebpage;
             var nodes = await DOM.WebpageToTree(webpage);
             var indexer = new InMemoryIndexer(100, 100);;
-            var neighbors = indexer.FindNeighbors(nodes, nodes);
+            var index = indexer.BuildIndex(nodes);
+            var neighbors = indexer.FindNeighbors(index, nodes);
             if (neighbors.Value.Count == 0)
                 Assert.Fail();
         }
@@ -68,9 +70,10 @@ namespace tree_matching_csharp.Test
             Console.WriteLine($"Webpage to tree took: {stopwatch.ElapsedMilliseconds}");
            
             var indexer = new InMemoryIndexer(100, 100);
+            var index = indexer.BuildIndex(nodes);
 
             stopwatch.Restart();
-            var neighbors = indexer.FindNeighbors(nodes, nodes);
+            var neighbors = indexer.FindNeighbors(index, nodes);
             stopwatch.Stop();
             Console.WriteLine($"find neighbors took: {stopwatch.ElapsedMilliseconds}");
             

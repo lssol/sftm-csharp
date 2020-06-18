@@ -49,8 +49,9 @@ namespace tree_matching_csharp.Test
                 return mistakes;
             }
 
+            var index = indexer.BuildIndex(originalNodes);
             stopWatch.Restart();
-            var neighbors = indexer.FindNeighbors(originalNodes, mutantNodes);
+            var neighbors = indexer.FindNeighbors(index, mutantNodes);
             stopWatch.Stop();
             Console.WriteLine($"Finding Neighbors took: {stopWatch.ElapsedMilliseconds}");
             

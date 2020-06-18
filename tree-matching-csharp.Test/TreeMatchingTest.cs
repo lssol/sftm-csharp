@@ -15,19 +15,21 @@ namespace tree_matching_csharp.Test
             LimitNeighbors = 100,
             MetropolisParameters = new Metropolis.Parameters
             {
-                Gamma        = 1f,
+                Gamma        = 0.8f,
                 Lambda       = 0.7f,
                 NbIterations = 50,
             },
-            NoMatchCost = 0.2,
+            NoMatchCost = 1.2,
+            MaxPenalizationChildren = 0.4,
+            MaxPenalizationParentsChildren = 0.2,
             PropagationParameters = new SimilarityPropagation.Parameters()
             {
-                Envelop = new[] {0.7, 0.0},
+                Envelop = new[] {2.8, 0.5, 0.01},
                 // Envelop    = new[] {0.0},
-                Parent     = 0.0,
+                Parent     = 0.25,
                 Sibling    = 0.0,
                 SiblingInv = 0.0,
-                ParentInv  = 0.5
+                ParentInv  = 0.7
             },
             MaxTokenAppearance = n => (int) Math.Sqrt(n)
         };

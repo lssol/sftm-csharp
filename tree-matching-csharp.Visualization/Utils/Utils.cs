@@ -1,4 +1,6 @@
-﻿using tree_matching_csharp.Visualization.Models;
+﻿using System.Linq;
+using MoreLinq.Extensions;
+using tree_matching_csharp.Visualization.Models;
 
 namespace tree_matching_csharp.Visualization.Utils
 {
@@ -12,7 +14,7 @@ namespace tree_matching_csharp.Visualization.Utils
                 Data = new CytoElementDef.DataClass
                 {
                     Id = node.Id.ToString(),
-                    Label = string.Join(" ", node.Value),
+                    Label = string.Join(" ", node.Value.Where(token => !token.StartsWith("#"))),
                     Parent = node.Parent?.Id.ToString(),
                     Value = node.Value
                 }

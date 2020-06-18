@@ -17,6 +17,7 @@ namespace tree_matching_csharp
             public float Gamma        { get; set; }
             public float Lambda       { get; set; }
             public int   NbIterations { get; set; }
+            public bool MetropolisNormalisation { get; set; }
         }
 
         private readonly Dictionary<Node, HashSet<Edge>>        _nodeToEdges;
@@ -39,7 +40,7 @@ namespace tree_matching_csharp
             _edges = edges.ToList();
             _nodeToEdges     = ComputeNodeToEdgesDic();
             ComputeAdjacentPenalization();
-            _edges           = _edges.OrderByDescending(edge => edge.NormalizedScore).ToList();
+            _edges           = _edges.OrderByDescending(edge => _params.MetropolisNormalisation ? edge.NormalizedScore : edge.Score).ToList();
             _linkedListNodes = new Dictionary<Edge, LinkedListNode<Edge>>(_edges.Count());
             _rand            = new Random();
             _newMatching = new List<Edge>(_nbNodes + 10);
@@ -115,7 +116,7 @@ namespace tree_matching_csharp
 
         private double ComputeObjective(IEnumerable<Edge> matching)
         {
-            var score = matching.Average(e => e.NormalizedScore);
+            var score = matching.Average(e => _params.MetropolisNormalisation ? e.NormalizedScore : e.Score);
             return score;
         }
 

@@ -41,7 +41,7 @@ namespace tree_matching_csharp.Benchmark
             {
                 var node = new Node
                 {
-                    Value       = parent == null ? new[] {"ROOT"} : new[] {"_" + root.Label},
+                    Value       = parent == null ? new List<string> {"ROOT"} : new List<string> {"_" + root.Label},
                     Parent      = parent,
                     LeftSibling = leftSibling
                 };
