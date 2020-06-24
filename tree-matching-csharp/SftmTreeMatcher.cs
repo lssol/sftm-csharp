@@ -33,7 +33,7 @@ namespace tree_matching_csharp
         public void AddParentToken(IEnumerable<Node> nodes, IDictionary<string, IList<Node>> index)
         {
             var rarestToken = nodes.ToDictionary(n => n, n => n.Value.MinBy(token => index.GetOrDefault(token, null)?.Count ?? nodes.Count()).First());
-            
+
             nodes.ForEach(n =>
             {
                 if (n.Parent != null && rarestToken.ContainsKey(n.Parent))
@@ -48,15 +48,15 @@ namespace tree_matching_csharp
             sourceNodes.ComputeChildren();
             targetNodes.ComputeChildren();
 
-            var indexer = new InMemoryIndexer(_param.LimitNeighbors, _param.MaxTokenAppearance(sourceNodes.Count()));
-            var index = indexer.BuildIndex(sourceNodes);
+            var indexer     = new InMemoryIndexer(_param.LimitNeighbors, _param.MaxTokenAppearance(sourceNodes.Count()));
+            var index       = indexer.BuildIndex(sourceNodes);
             var indexTarget = indexer.BuildIndex(targetNodes);
 
             AddParentToken(sourceNodes, index.GetTokenDictionary());
             AddParentToken(targetNodes, indexTarget.GetTokenDictionary());
 
             index = indexer.BuildIndex(sourceNodes);
-            
+
             var neighbors = indexer.FindNeighbors(index, targetNodes);
             ComputeChildrenPenalization(neighbors, sourceNodes.Concat(targetNodes));
             _param.PropagationParameters.Envelop.ForEach(envelop => { neighbors = SimilarityPropagation.PropagateSimilarity(neighbors, _param.PropagationParameters, envelop); });

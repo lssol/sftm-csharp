@@ -16,11 +16,17 @@ namespace tree_matching_csharp.Benchmark
         private readonly Parameters _parameters;
         private readonly HttpClient _client;
 
+        public enum LabelCostFunction
+        {
+            String,
+            Default
+        }
         public class Parameters
         {
             public double InsertionCost { get; set; }
             public double DeletionCost  { get; set; }
             public double RelabelCost   { get; set; }
+            public LabelCostFunction LabelCostFunction { get; set; }
         }
 
         public class Response
@@ -71,7 +77,12 @@ namespace tree_matching_csharp.Benchmark
                 relabelCost   = _parameters.RelabelCost,
             };
             var contentInput    = new StringContent(JsonConvert.SerializeObject(input));
-            var response        = await _client.PostAsync(Settings.UrlRTED, contentInput);
+            var url = _parameters.LabelCostFunction switch
+            {
+                LabelCostFunction.String  => Settings.UrlRTEDString,
+                LabelCostFunction.Default => Settings.UrlRTEDDefault,
+            };
+            var response        = await _client.PostAsync(url, contentInput);
             var responseContent = await response.Content.ReadAsStringAsync();
             var parsedResponse  = JsonConvert.DeserializeObject<ResponseApi>(responseContent);
             

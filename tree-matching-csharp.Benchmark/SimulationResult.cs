@@ -33,5 +33,34 @@ namespace tree_matching_csharp.Benchmark
         public int TotalTarget { get; set; }
         public double FTMRelativeCost { get; set; }
         public IEnumerable<Edge> Matching { get; set; }
+        public double Precision { get; set; }
+        public double Recall { get; set; }
+        public double CostAvg { get; set; }
+    }
+
+    public class EdgeSimulationResult
+    {
+        public string MutantId { get; set; }
+        public string OriginalId { get; set; }
+        
+        public string MatcherLabel { get; set; }
+        
+        public string SourceSignature { get; set; }
+        public string TargetSignature { get; set; }
+        
+        public bool IsCorrect { get; set; }
+        
+        public int NbSiblingsSource  { get; set; }
+        public int NbSiblingsTarget  { get; set; }
+        public int NbChildrenSource  { get; set; }
+        public int NbChildrenTarget  { get; set; }
+        
+        public int TotalNodesSource { get; set; }
+        public int TotalNodesTarget { get; set; }
+        
+        public double RelabelCost  { get; set; }
+        public double SiblingCost  { get; set; }
+        public double AncestryCost  { get; set; }
+        
     }
 }

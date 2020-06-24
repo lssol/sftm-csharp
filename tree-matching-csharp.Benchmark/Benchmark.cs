@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using MoreLinq.Extensions;
 
 namespace tree_matching_csharp.Benchmark
 {
-    public static class MutationBenchmark
+    public static class Benchmark
     {
         public static async IAsyncEnumerable<SimulationResultMutation> RunMutation(string label, ITreeMatcher matcher)
         {
@@ -39,15 +35,51 @@ namespace tree_matching_csharp.Benchmark
             }
         }
 
-        public static void CheckMatchingIsComplete(IEnumerable<Edge> edges, IEnumerable<Node> sources, IEnumerable<Node> targets)
+        public static async IAsyncEnumerable<EdgeSimulationResult> RunEdgeSimulation(IEnumerable<(string, ITreeMatcher)> matchers)
         {
-            var sourcesFromEdges = new HashSet<Node>(edges.Select(e => e.Source).Where(s => s != null));
-            var targetsFromEdges = new HashSet<Node>(edges.Select(e => e.Target).Where(s => s != null));
-            
-            if (sources.Count() != sourcesFromEdges.Count)
-                Console.WriteLine($"Different values, sources = {sources.Count()} and sourcesFromEdge = {sourcesFromEdges.Count()}");
-            if (targets.Count() != targetsFromEdges.Count)
-                Console.WriteLine($"Different values, targets = {targets.Count()} and targetsFromEdge = {targetsFromEdges.Count()}");
+            var mongoRepo = await MongoRepository.InitConnection();
+            foreach (var (original, mutant) in mongoRepo.GetCouples())
+            foreach (var (name, matcher) in matchers)
+            {
+                var                   websiteMatcher = new WebsiteMatcher(matcher);
+                WebsiteMatcher.Result results;
+                try
+                {
+                    results = await websiteMatcher.MatchWebsites(original.Content, mutant.Content);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    continue;
+                }
+
+                var edges = results.Matching.ToList();
+                new FtmCost(edges).ComputeCost();
+                foreach (var edge in edges)
+                {
+                    if (edge.Source == null || edge.Target == null)
+                        continue;
+
+                    yield return new EdgeSimulationResult
+                    {
+                        MutantId         = mutant.Id.ToString(),
+                        OriginalId       = original.Id.ToString(),
+                        SourceSignature  = edge.Source.Signature,
+                        TargetSignature  = edge.Target.Signature,
+                        TotalNodesSource = original.Total,
+                        TotalNodesTarget = mutant.Total,
+                        IsCorrect        = edge.Source.Signature == edge.Target.Signature,
+                        NbChildrenSource = edge.Source.Children.Count,
+                        NbChildrenTarget = edge.Target.Children.Count,
+                        NbSiblingsSource = edge.Source.Parent?.Children.Count ?? 0,
+                        NbSiblingsTarget = edge.Target.Parent?.Children.Count ?? 0,
+                        AncestryCost     = edge.FtmCost.Ancestry,
+                        RelabelCost      = edge.FtmCost.Relabel,
+                        SiblingCost      = edge.FtmCost.Sibling,
+                        MatcherLabel     = name
+                    };
+                }
+            }
         }
 
         public static async IAsyncEnumerable<(IEnumerable<Node> source, IEnumerable<Node> target, SimulationResultBracket)> RunBracket(string label, ITreeMatcher matcher, string dataset)
@@ -64,30 +96,38 @@ namespace tree_matching_csharp.Benchmark
                     Console.WriteLine(e);
                     continue;
                 }
+
                 if (resultMatching == null)
                     continue;
 
-                var maxTotal = Math.Max(source.Count(), target.Count());
-                var edges = resultMatching.Edges.ToList();
-                var ftmCost = new FtmCost(edges).ComputeCost();
-                CheckMatchingIsComplete(resultMatching.Edges, source, target);
+                var maxTotal        = Math.Max(source.Count(), target.Count());
+                var edges           = resultMatching.Edges.ToList();
+                var ftmCost         = new FtmCost(edges).ComputeCost();
                 var ftmRelativeCost = (ftmCost.Ancestry + ftmCost.Relabel + ftmCost.Sibling + ftmCost.NoMatch) / maxTotal;
+                var ftmPrecisionAvg = edges.Average(e => e.FtmCost.Ancestry + e.FtmCost.Relabel + e.FtmCost.Sibling);
+
+                var edgesMatched = edges.Count(e => e.FtmCost.NoMatch == 0);
+                var precision = edgesMatched == 0 ? 1 : (edges.Count(e => e.FtmCost.IsCorrect) / edgesMatched);
+                var recall    = edges.Count(e => e.FtmCost.IsCorrect) / (double) edges.Count;
                 yield return (source, target, new SimulationResultBracket
                 {
-                    Dataset = dataset,
-                    Id = key,
-                    TotalSource = source.Count(),
-                    TotalTarget = target.Count(),
+                    Dataset         = dataset,
+                    Id              = key,
+                    TotalSource     = source.Count(),
+                    TotalTarget     = target.Count(),
                     ComputationTime = resultMatching.ComputationTime,
-                    MatcherLabel = label,
-                    NoMatch = resultMatching.Edges.Count(e => e.Source == null || e.Target == null),
-                    FTMCost = ftmCost,
+                    MatcherLabel    = label,
+                    NoMatch         = resultMatching.Edges.Count(e => e.Source == null || e.Target == null),
+                    FTMCost         = ftmCost,
                     FTMRelativeCost = ftmRelativeCost,
-                    Matching = resultMatching.Edges
+                    Matching        = resultMatching.Edges,
+                    Precision       = precision,
+                    Recall          = recall,
+                    CostAvg = ftmPrecisionAvg
                 });
             }
         }
-        
+
         private static SimulationResultMutation ToSimulationResult(WebsiteMatcher.Result result, MutationCouple mutationCouple, string label)
         {
             var ftmCostComputer = new FtmCost(result.Matching.ToList());

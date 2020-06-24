@@ -13,12 +13,14 @@ namespace tree_matching_csharp.Benchmark
         private static   MongoRepository              _instance;
         private readonly IMongoCollection<DOMVersion> _mutationCollection;
         private readonly IMongoCollection<SimulationResultMutation> _simulationResultsCollection;
+        private readonly IMongoCollection<EdgeSimulationResult> _edgeSimulationResultCollection;
 
 
-        private MongoRepository(IMongoCollection<DOMVersion> mutationCollection, IMongoCollection<SimulationResultMutation> simulationResultsCollection)
+        private MongoRepository(IMongoCollection<DOMVersion> mutationCollection, IMongoCollection<SimulationResultMutation> simulationResultsCollection, IMongoCollection<EdgeSimulationResult> edgeSimulationResultCollection)
         {
             _mutationCollection = mutationCollection;
             _simulationResultsCollection = simulationResultsCollection;
+            _edgeSimulationResultCollection = edgeSimulationResultCollection;
         }
 
         public static async Task<MongoRepository> InitConnection()
@@ -33,17 +35,23 @@ namespace tree_matching_csharp.Benchmark
 
             var mutationCollection = database.GetCollection<DOMVersion>(Settings.Mongo.MutationCollection);
             var simulationResultCollection = database.GetCollection<SimulationResultMutation>(Settings.Mongo.ResultCollection);
+            var edgeSimulationResultCollection = database.GetCollection<EdgeSimulationResult>(Settings.Mongo.EdgeSimulationResultCollection);
             await simulationResultCollection.Indexes?.CreateOneAsync(Builders<SimulationResultMutation>.IndexKeys.Ascending(s => s.Label));
             await simulationResultCollection.Indexes?.CreateOneAsync(Builders<SimulationResultMutation>.IndexKeys.Ascending(s => s.OriginalId));
             await simulationResultCollection.Indexes?.CreateOneAsync(Builders<SimulationResultMutation>.IndexKeys.Ascending(s => s.MutantId));
-            _instance = new MongoRepository(mutationCollection, simulationResultCollection);
+            _instance = new MongoRepository(mutationCollection, simulationResultCollection, edgeSimulationResultCollection);
 
             return _instance;
         }
 
-        public void SaveResults(SimulationResultMutation resultMutation)
+        public void SaveResultsSimulation(SimulationResultMutation resultMutation)
         {
             _simulationResultsCollection.InsertOne(resultMutation);
+        }
+
+        public void SaveResultEdgesSimulation(EdgeSimulationResult results)
+        {
+            _edgeSimulationResultCollection.InsertOne(results);
         }
 
         public async Task<bool> MeasureAlreadyExists(string label, string mutantId)

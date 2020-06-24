@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MoreLinq;
 
 namespace tree_matching_csharp
 {
@@ -11,6 +12,7 @@ namespace tree_matching_csharp
             public double   SiblingInv { get; set; }
             public double   Parent     { get; set; }
             public double   ParentInv  { get; set; }
+            public double   Children  { get; set; }
             public double[] Envelop    { get; set; }
         }
 
@@ -31,10 +33,21 @@ namespace tree_matching_csharp
         public static Neighbors PropagateSimilarity(Neighbors neighbors, Parameters parameters, double currentEnvelop)
         {
             var newSimilarity = new Neighbors();
+            void PropagateParenthood(Node sourceNode, Node targetNode)
+            {
+                var score = neighbors.Score(sourceNode, targetNode);
+                targetNode
+                    .Children
+                    .ForEach(targetChild => targetChild.Children
+                        .ForEach(sourceChild => IncreaseScore(newSimilarity, sourceChild, targetChild, score * parameters.Children * currentEnvelop)));
+            }
+            
             foreach (var (targetNode, hits) in neighbors.Value)
             foreach (var (sourceNode, score) in hits)
             {
                 IncreaseScore(newSimilarity, sourceNode, targetNode, score);
+                // PropagateParenthood(sourceNode, targetNode);
+                
                 var pSource = sourceNode.Parent;
                 var pTarget = targetNode.Parent;
 
