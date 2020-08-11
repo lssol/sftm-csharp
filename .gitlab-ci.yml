@@ -1,0 +1,10 @@
+stages:
+    - run
+
+Run Benchmark:
+    stage: run
+    tags:
+        - zebrain
+    script:
+        - docker-compose up
+

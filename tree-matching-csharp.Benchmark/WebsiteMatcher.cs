@@ -10,8 +10,8 @@ namespace tree_matching_csharp.Benchmark
     {
         public class Result
         {
-            public IEnumerable<(string, string)> SignatureMatching    { get; set; }
-            public IEnumerable<Edge>             Matching             { get; set; }
+            public IEnumerable<(string?, string?)>? SignatureMatching    { get; set; }
+            public IEnumerable<Edge>?             Matching             { get; set; }
             public int                           NbMismatch           { get; set; }
             public int                           NbNoMatch            { get; set; }
             public int                           NbNoMatchUnjustified { get; set; }
@@ -28,14 +28,17 @@ namespace tree_matching_csharp.Benchmark
             _matcher = matcher;
         }
 
-        public async Task<Result> MatchWebsites(string source, string target)
+        public async Task<Result?> MatchWebsites(string source, string target)
         {
             var sourceNodes = await DOM.WebpageToTree(source);
             var targetNodes = await DOM.WebpageToTree(target);
 
             var minCount = Math.Min(sourceNodes.Count(), targetNodes.Count());
 
-            var matching        = await _matcher.MatchTrees(sourceNodes, targetNodes);
+            var matching = await _matcher.MatchTrees(sourceNodes, targetNodes);
+            if (matching == null)
+                return null;
+            
             var computationTime = matching.ComputationTime;
 
             if (!IsSignaturePresent(sourceNodes) || !IsSignaturePresent(targetNodes))
@@ -46,13 +49,13 @@ namespace tree_matching_csharp.Benchmark
             commonSignatures.IntersectWith(targetSignatures);
 
             var nbNoMatch = matching.Edges.Count(m =>
-                commonSignatures.Contains(m.Source?.Signature ?? m.Target?.Signature)
+                commonSignatures.Contains((m.Source?.Signature ?? m.Target?.Signature)!)
                 && (m.Source == null || m.Target == null)
             );
             var nbMismatch  = matching.Edges.Count(m => m.Source != null && m.Target != null && m.Source.Signature != m.Target.Signature);
             var goodMatches = matching.Edges.Count(m => m.Source != null && m.Target != null && m.Source.Signature == m.Target.Signature);
 
-            var signaturesMatching = matching.Edges.Select(m => (m.Source?.Signature, m.Target?.Signature));
+            var signaturesMatching = matching.Edges?.Select(m => (m.Source?.Signature, m.Target?.Signature));
 
             return new Result
             {

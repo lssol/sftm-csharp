@@ -15,7 +15,6 @@ namespace tree_matching_csharp.Benchmark
         private readonly IMongoCollection<SimulationResultMutation> _simulationResultsCollection;
         private readonly IMongoCollection<EdgeSimulationResult> _edgeSimulationResultCollection;
 
-
         private MongoRepository(IMongoCollection<DOMVersion> mutationCollection, IMongoCollection<SimulationResultMutation> simulationResultsCollection, IMongoCollection<EdgeSimulationResult> edgeSimulationResultCollection)
         {
             _mutationCollection = mutationCollection;
@@ -70,7 +69,7 @@ namespace tree_matching_csharp.Benchmark
         {
             var builder = Builders<DOMVersion>.Filter;
             var filter  = builder.Eq(doc => doc.Original, null) & builder.Lt(doc => doc.Total, Settings.MaxSizeWebsite);
-            var cursor  = _mutationCollection.Find(filter).ToCursor();
+            var cursor  = _mutationCollection.Find(filter, new FindOptions{NoCursorTimeout = true}).ToCursor();
             foreach (var original in cursor.ToEnumerable())
             {
                 var filterBuilder = Builders<DOMVersion>.Filter;

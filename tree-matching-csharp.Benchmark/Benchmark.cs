@@ -6,7 +6,7 @@ namespace tree_matching_csharp.Benchmark
 {
     public static class Benchmark
     {
-        public static async IAsyncEnumerable<SimulationResultMutation> RunMutation(string label, ITreeMatcher matcher)
+        public static async IAsyncEnumerable<SimulationResultMutation?> RunMutation(string label, ITreeMatcher matcher)
         {
             var websiteMatcher = new WebsiteMatcher(matcher);
             var mongoRepo      = await MongoRepository.InitConnection();
@@ -18,7 +18,7 @@ namespace tree_matching_csharp.Benchmark
                     continue;
                 }
 
-                WebsiteMatcher.Result results;
+                WebsiteMatcher.Result? results;
                 try
                 {
                     results = await websiteMatcher.MatchWebsites(original.Content, mutant.Content);
@@ -26,6 +26,7 @@ namespace tree_matching_csharp.Benchmark
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
+                    Console.WriteLine("Continuing anyway...");
                     continue;
                 }
 
@@ -47,14 +48,17 @@ namespace tree_matching_csharp.Benchmark
                     continue;
                 }
                 var                   websiteMatcher = new WebsiteMatcher(matcher);
-                WebsiteMatcher.Result results;
+                WebsiteMatcher.Result? results;
                 try
                 {
                     results = await websiteMatcher.MatchWebsites(original.Content, mutant.Content);
+                    if (results == null)
+                        throw new Exception("No results from website matching");
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
+                    Console.WriteLine("Continuing anyway...");
                     continue;
                 }
 

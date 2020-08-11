@@ -11,6 +11,6 @@ namespace tree_matching_csharp
     }
     public interface ITreeMatcher
     {
-        public Task<TreeMatcherResponse> MatchTrees(IEnumerable<Node> source, IEnumerable<Node> target);
+        public Task<TreeMatcherResponse?> MatchTrees(IEnumerable<Node> source, IEnumerable<Node> target);
     }
 }

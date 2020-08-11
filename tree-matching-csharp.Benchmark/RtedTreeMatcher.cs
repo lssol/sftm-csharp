@@ -55,7 +55,7 @@ namespace tree_matching_csharp.Benchmark
             _client = new HttpClient {Timeout = Timeout.InfiniteTimeSpan};
         }
 
-        public async Task<TreeMatcherResponse> MatchTrees(IEnumerable<Node> sourceNodes, IEnumerable<Node> targetNodes)
+        public async Task<TreeMatcherResponse?> MatchTrees(IEnumerable<Node> sourceNodes, IEnumerable<Node> targetNodes)
         {
             sourceNodes.ComputeChildren();
             targetNodes.ComputeChildren();
@@ -81,10 +81,13 @@ namespace tree_matching_csharp.Benchmark
             {
                 LabelCostFunction.String  => Settings.UrlRTEDString,
                 LabelCostFunction.Default => Settings.UrlRTEDDefault,
+                _ => throw new Exception("Unsupported label cost function")
             };
             var response        = await _client.PostAsync(url, contentInput);
             var responseContent = await response.Content.ReadAsStringAsync();
             var parsedResponse  = JsonConvert.DeserializeObject<ResponseApi>(responseContent);
+            if (parsedResponse.Matching == null)
+                return null;
             
             return new TreeMatcherResponse
             {
