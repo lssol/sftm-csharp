@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace tree_matching_csharp.Benchmark
 {
@@ -37,7 +38,8 @@ namespace tree_matching_csharp.Benchmark
         public double Recall { get; set; }
         public double CostAvg { get; set; }
     }
-
+    
+    [BsonIgnoreExtraElements]
     public class EdgeSimulationResult
     {
         public string MutantId { get; set; }
