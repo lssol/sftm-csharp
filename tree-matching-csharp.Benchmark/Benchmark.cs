@@ -41,6 +41,11 @@ namespace tree_matching_csharp.Benchmark
             foreach (var (original, mutant) in mongoRepo.GetCouples())
             foreach (var (name, matcher) in matchers)
             {
+                if (await mongoRepo.EdgeAlreadyExists(name, mutant.Id.ToString()))
+                {
+                    Console.WriteLine("Skipped couple");
+                    continue;
+                }
                 var                   websiteMatcher = new WebsiteMatcher(matcher);
                 WebsiteMatcher.Result results;
                 try
@@ -108,7 +113,7 @@ namespace tree_matching_csharp.Benchmark
 
                 var edgesMatched = edges.Count(e => e.FtmCost.NoMatch == 0);
                 var precision = edgesMatched == 0 ? 1 : (edges.Count(e => e.FtmCost.IsCorrect) / edgesMatched);
-                var recall    = edges.Count(e => e.FtmCost.IsCorrect) / (double) edges.Count;
+                var recall = edges.Count(e => e.FtmCost.IsCorrect) / (double) Math.Min(source.Count(), target.Count());
                 yield return (source, target, new SimulationResultBracket
                 {
                     Dataset         = dataset,

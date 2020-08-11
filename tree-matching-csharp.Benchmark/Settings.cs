@@ -9,7 +9,7 @@ namespace tree_matching_csharp.Benchmark
             public const  string ConnectionString               = "mongodb://wehave_prod%40service:AX3ohnia@datalakestar.amarislab.com:27018/?authMechanism=PLAIN&appname=tree-matching-csharp.benchmark&ssl=true";
             public const  string BenchmarkDatabase              = "locatorBenchmark";
             public const  string MutationCollection             = "DOMVersions";
-            public const  string ResultCollection               = "VLDB_Mutation_SimulationResults";
+            public const  string ResultCollection               = "VLDB_Mutation_SimulationResults_v2";
             public static string EdgeSimulationResultCollection = "VLDB_Mutation_EdgeSimulationResults";
         }
 
@@ -26,15 +26,15 @@ namespace tree_matching_csharp.Benchmark
                 NbIterations            = 1,
                 MetropolisNormalisation = true
             },
-            NoMatchCost                    = 1.6,
+            NoMatchCost                    = 1.3,
             MaxPenalizationChildren        = 0.4,
             MaxPenalizationParentsChildren = 0.2,
             PropagationParameters = new SimilarityPropagation.Parameters
             {
-                Envelop = new[] {0.9, 0.1, 0.01},
+                Envelop    = new[] {0.9, 0.1, 0.01},
                 Parent     = 0.4,
-                Sibling    = 0.1,
-                SiblingInv = 0.1,
+                Sibling    = 0.0,
+                SiblingInv = 0.0,
                 ParentInv  = 0.9,
                 Children   = 0.0
             },
@@ -51,8 +51,9 @@ namespace tree_matching_csharp.Benchmark
             RelabelCost   = 1,
         };
 
-        public const  int MaxSizeWebsite = 1500;
-        public static int ThreadsRTED    = 4;
-        public static int ThreadsSFTM    = 2;
+        public const  int MaxSizeWebsite     = 1500;
+        public static int ThreadsRTED        = 2;
+        public static int ThreadsRTEDDefault = 2;
+        public static int ThreadsSFTM        = 2;
     }
 }

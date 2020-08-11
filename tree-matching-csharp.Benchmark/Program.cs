@@ -27,18 +27,19 @@ namespace tree_matching_csharp.Benchmark
 
         public static async Task RunAndSaveBracket(string label, ITreeMatcher matcher)
         {
-            var results = Benchmark.RunBracket(label, matcher, "bolzano");
+            var results    = Benchmark.RunBracket(label, matcher, "bolzano");
             var resultList = new List<SimulationResultBracket>();
-            
+
             const int maxLoops = 40;
-            var i = 0;
+            var       i        = 0;
             await foreach (var (source, target, result) in results)
             {
                 if (i == maxLoops)
                     break;
-                resultList.Add(result);     
+                resultList.Add(result);
                 i++;
             }
+
             Console.WriteLine($"[{label}] Cost Average: {resultList.Average(r => r.CostAvg)}");
             Console.WriteLine($"[{label}] Precision: {resultList.Average(r => r.Precision)}");
             Console.WriteLine($"[{label}] Recall: {resultList.Average(r => r.Recall)}");
@@ -47,7 +48,7 @@ namespace tree_matching_csharp.Benchmark
 
         public static async Task RunAndSaveEdgesSimulation(IEnumerable<(string, ITreeMatcher)> matchers)
         {
-            var repo = await MongoRepository.InitConnection();
+            var repo   = await MongoRepository.InitConnection();
             var cursor = Benchmark.RunEdgeSimulation(matchers);
             await foreach (var edgeResult in cursor)
             {
@@ -55,7 +56,7 @@ namespace tree_matching_csharp.Benchmark
                 Console.WriteLine(edgeResult.ToJson());
             }
         }
-        
+
 
         public static void PrintTree(Node tree, String indent, bool last)
         {
@@ -67,27 +68,42 @@ namespace tree_matching_csharp.Benchmark
                 PrintTree(tree.Children[i], indent, i == tree.Children.Count - 1);
             }
         }
-        
+
         static async Task Main(string[] args)
         {
-            var sftm = new SftmTreeMatcher(Settings.SFTMParameters);
-            var rted = new RtedTreeMatcher(Settings.RTEDParameters);
+            var sftm        = new SftmTreeMatcher(Settings.SFTMParameters);
+            var rtedDefault = new RtedTreeMatcher(new RtedTreeMatcher.Parameters
+            {
+                DeletionCost = Settings.RTEDParameters.DeletionCost,
+                InsertionCost = Settings.RTEDParameters.InsertionCost,
+                RelabelCost = Settings.RTEDParameters.RelabelCost,
+                LabelCostFunction = RtedTreeMatcher.LabelCostFunction.Default
+            });
+            var rtedString = new RtedTreeMatcher(new RtedTreeMatcher.Parameters
+            {
+                DeletionCost = Settings.RTEDParameters.DeletionCost,
+                InsertionCost = Settings.RTEDParameters.InsertionCost,
+                RelabelCost = Settings.RTEDParameters.RelabelCost,
+                LabelCostFunction = RtedTreeMatcher.LabelCostFunction.String
+            });
 
-            // await RunAndSaveEdgesSimulation(new (string, ITreeMatcher)[] {("SFTM", sftm), ("RTED", rted)});
-            
-            await RunAndSaveBracket("SFTM", sftm);
-            await RunAndSaveBracket("RTED", rted);
+            await RunAndSaveEdgesSimulation(new (string, ITreeMatcher)[] {("RTED-default", rtedDefault)});
+
+            // await RunAndSaveBracket("SFTM", sftm);
+            // await RunAndSaveBracket("RTED-default", rtedDefault);
 
             // await RunAndSaveMutation("SFTM2", sftm);
+            
             // MUTATION
             // var tasks = new List<Task>();
-
-
-            // Enumerable.Range(0, Settings.ThreadsRTED)
-            //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED", rted))); });
+            //
+            // Enumerable.Range(0, Settings.ThreadsRTEDDefault)
+            //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED-default", rtedDefault))); });
             // Enumerable.Range(0, Settings.ThreadsSFTM)
             //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("SFTM", sftm))); });
-
+            // Enumerable.Range(0, Settings.ThreadsRTED)
+            //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED", rtedString))); });
+            //
             // foreach (var task in tasks)
             //     await task;
         }

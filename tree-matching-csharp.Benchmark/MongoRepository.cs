@@ -59,6 +59,12 @@ namespace tree_matching_csharp.Benchmark
             return await _simulationResultsCollection.AsQueryable()
                 .AnyAsync(s => s.Label == label && s.MutantId == mutantId);
         }
+        
+        public async Task<bool> EdgeAlreadyExists(string label, string mutantId)
+        {
+            return await _edgeSimulationResultCollection.AsQueryable()
+                .AnyAsync(s => s.MatcherLabel == label && s.MutantId == mutantId);
+        }
 
         public IEnumerable<MutationCouple> GetCouples()
         {
