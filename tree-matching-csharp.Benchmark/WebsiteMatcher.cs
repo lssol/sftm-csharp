@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace tree_matching_csharp.Benchmark
 {
-    public class WebsiteMatcher
+    public class WebsiteMatcher : IWebsiteMatcher
     {
         public class Result
         {

@@ -34,7 +34,7 @@ namespace tree_matching_csharp
             return tokens;
         }
 
-        private static async Task<IDocument> WebpageToDocument(string webpage)
+        public static async Task<IDocument> WebpageToDocument(string webpage)
         {
             var config  = Configuration.Default;
             var context = BrowsingContext.New(config);

@@ -29,13 +29,6 @@ namespace tree_matching_csharp.Benchmark
             public LabelCostFunction LabelCostFunction { get; set; }
         }
 
-        public class Response
-        {
-            public int               ComputationTime { get; set; }
-            public double            Distance        { get; set; }
-            public IEnumerable<Edge> Matching        { get; set; }
-        }
-
         private class ResponseApi
         {
             public class Match
