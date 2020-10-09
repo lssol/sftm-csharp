@@ -4,8 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
 using AngleSharp;
 using AngleSharp.Dom;
+using HtmlAgilityPack;
+using MoreLinq.Extensions;
 using Nest;
 
 namespace tree_matching_csharp
@@ -20,7 +24,7 @@ namespace tree_matching_csharp
                 return new string[] {};
             
             var value = attr.Value.Split(" ");
-            value.Append(attr.Name);
+            Enumerable.Append(value, attr.Name);
             
             return value;
         }
@@ -81,6 +85,38 @@ namespace tree_matching_csharp
             Copy(doc.Body, null, null, null, "");
 
             return nodes;
+        }
+
+        public static IEnumerable<HtmlNode> GetNodesInPostOrder(this HtmlNode root)
+        {
+            var nodes = new List<HtmlNode>();
+            root.PostOrderTraversal(n => {nodes.Add(n);});
+
+            return nodes;
+        }
+
+        public static void PostOrderTraversal(this HtmlNode root, Action<HtmlNode> f)
+        {
+            foreach (var child in root.ChildNodes)
+                child.PostOrderTraversal(f);
+
+            f(root);
+        }
+        
+        public static IEnumerable<XmlNode> GetNodesInPostOrder(this XmlNode root)
+        {
+            var nodes = new List<XmlNode>();
+            root.PostOrderTraversal(n => {nodes.Add(n);});
+
+            return nodes;
+        }
+        
+        public static void PostOrderTraversal(this XmlNode root, Action<XmlNode> f)
+        {
+            foreach (XmlNode child in root.ChildNodes)
+                PostOrderTraversal(child, f);
+
+            f(root);
         }
 
         public static async Task<IEnumerable<Node>> WebpageToTree(string source)

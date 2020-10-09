@@ -49,6 +49,24 @@ namespace tree_matching_csharp.Test
             var matching = await websiteMatcher.MatchWebsites(source, target);
             watch.Stop();
             Console.WriteLine($"Overall Matching the websites took: {watch.ElapsedMilliseconds}");
+            Console.WriteLine($"No match: {matching.NbNoMatch}");
+            Console.WriteLine($"Nomatch unjusitified: {matching.NbNoMatchUnjustified}, mismatch: {matching.NbMismatch}");
+            Console.WriteLine($"The success ratio is: {matching.GoodMatches / (double) matching.MaxGoodMatches}");
+        }
+
+        [Test]
+        public async Task TestXyDiff()
+        {
+            var watch       = new Stopwatch();
+            var xyDiff = new XyDiffMatcher();
+
+            var source = File.ReadAllText("websites/linkedin.html");
+            var target = File.ReadAllText("websites/linkedin_mutant.html");
+
+            watch.Restart();
+            var matching = await xyDiff.MatchWebsites(source, target);
+            watch.Stop();
+            Console.WriteLine($"Overall Matching the websites took: {watch.ElapsedMilliseconds}");
 
             Console.WriteLine($"No match: {matching.NbNoMatch}");
             Console.WriteLine($"Nomatch unjusitified: {matching.NbNoMatchUnjustified}, mismatch: {matching.NbMismatch}");

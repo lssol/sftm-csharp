@@ -43,6 +43,8 @@ namespace tree_matching_csharp.Benchmark
 
         public const string UrlRTEDString  = "http://163.172.16.184:7040";
         public const string UrlRTEDDefault = "http://163.172.16.184:7041";
+        
+        public const string UrlXyDiff = "http://localhost:5000/match";
 
         public static readonly RtedTreeMatcher.Parameters RTEDParameters = new RtedTreeMatcher.Parameters
         {
