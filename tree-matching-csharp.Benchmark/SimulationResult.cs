@@ -20,6 +20,7 @@ namespace tree_matching_csharp.Benchmark
         public int                     NbMutationsMade    { get; set; }
         public Dictionary<string, int> MutationsMade      { get; set; }
         public FtmCost.Cost            FTMCost            { get; set; }
+        public int MaxGoodMatch { get; set; }
     }
 
     public class SimulationResultBracket

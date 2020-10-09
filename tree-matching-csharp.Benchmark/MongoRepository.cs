@@ -65,11 +65,11 @@ namespace tree_matching_csharp.Benchmark
                 .AnyAsync(s => s.MatcherLabel == label && s.MutantId == mutantId);
         }
 
-        public IEnumerable<MutationCouple> GetCouples()
+        public IEnumerable<MutationCouple> GetCouples(int? limit = null)
         {
             var builder = Builders<DOMVersion>.Filter;
             var filter  = builder.Eq(doc => doc.Original, null) & builder.Lt(doc => doc.Total, Settings.MaxSizeWebsite);
-            var cursor  = _mutationCollection.Find(filter, new FindOptions{NoCursorTimeout = true}).ToCursor();
+            var cursor  = _mutationCollection.Find(filter, new FindOptions{NoCursorTimeout = true}).Limit(limit).ToCursor();
             foreach (var original in cursor.ToEnumerable())
             {
                 var filterBuilder = Builders<DOMVersion>.Filter;

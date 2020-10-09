@@ -6,11 +6,10 @@ namespace tree_matching_csharp.Benchmark
 {
     public static class Benchmark
     {
-        public static async IAsyncEnumerable<SimulationResultMutation?> RunMutation(string label, ITreeMatcher matcher)
+        public static async IAsyncEnumerable<SimulationResultMutation?> RunMutation(string label, IWebsiteMatcher matcher, int? limit = null)
         {
-            var websiteMatcher = new WebsiteMatcher(matcher);
-            var mongoRepo      = await MongoRepository.InitConnection();
-            foreach (var (original, mutant) in mongoRepo.GetCouples())
+            var mongoRepo = await MongoRepository.InitConnection();
+            foreach (var (original, mutant) in mongoRepo.GetCouples(limit))
             {
                 if (await mongoRepo.MeasureAlreadyExists(label, mutant.Id.ToString()))
                 {
@@ -21,7 +20,7 @@ namespace tree_matching_csharp.Benchmark
                 WebsiteMatcher.Result? results;
                 try
                 {
-                    results = await websiteMatcher.MatchWebsites(original.Content, mutant.Content);
+                    results = await matcher.MatchWebsites(original.Content, mutant.Content);
                 }
                 catch (Exception e)
                 {
@@ -47,7 +46,8 @@ namespace tree_matching_csharp.Benchmark
                     Console.WriteLine("Skipped couple");
                     continue;
                 }
-                var                   websiteMatcher = new WebsiteMatcher(matcher);
+
+                var                    websiteMatcher = new WebsiteMatcher(matcher);
                 WebsiteMatcher.Result? results;
                 try
                 {
@@ -116,8 +116,8 @@ namespace tree_matching_csharp.Benchmark
                 var ftmPrecisionAvg = edges.Average(e => e.FtmCost.Ancestry + e.FtmCost.Relabel + e.FtmCost.Sibling);
 
                 var edgesMatched = edges.Count(e => e.FtmCost.NoMatch == 0);
-                var precision = edgesMatched == 0 ? 1 : (edges.Count(e => e.FtmCost.IsCorrect) / edgesMatched);
-                var recall = edges.Count(e => e.FtmCost.IsCorrect) / (double) Math.Min(source.Count(), target.Count());
+                var precision    = edgesMatched == 0 ? 1 : (edges.Count(e => e.FtmCost.IsCorrect) / edgesMatched);
+                var recall       = edges.Count(e => e.FtmCost.IsCorrect) / (double) Math.Min(source.Count(), target.Count());
                 yield return (source, target, new SimulationResultBracket
                 {
                     Dataset         = dataset,
@@ -132,14 +132,15 @@ namespace tree_matching_csharp.Benchmark
                     Matching        = resultMatching.Edges,
                     Precision       = precision,
                     Recall          = recall,
-                    CostAvg = ftmPrecisionAvg
+                    CostAvg         = ftmPrecisionAvg
                 });
             }
         }
 
         private static SimulationResultMutation ToSimulationResult(WebsiteMatcher.Result result, MutationCouple mutationCouple, string label)
         {
-            var ftmCostComputer = new FtmCost(result.Matching.ToList());
+            // var ftmCostComputer = new FtmCost(result.Matching.ToList());
+            var (original, mutant) = mutationCouple;
             return new SimulationResultMutation
             {
                 Mismatch           = result.NbMismatch,
@@ -147,13 +148,14 @@ namespace tree_matching_csharp.Benchmark
                 Label              = label,
                 ComputationTime    = result.ComputationTime,
                 NoMatch            = result.NbNoMatch,
+                MaxGoodMatch       = result.MaxGoodMatches,
                 Total              = result.Total,
-                NbMutationsMade    = mutationCouple.Mutant.NbMutations,
-                MutantId           = mutationCouple.Mutant.Id.ToString(),
-                OriginalId         = mutationCouple.Original.Id.ToString(),
+                NbMutationsMade    = mutant.NbMutations,
+                MutantId           = mutant.Id.ToString(),
+                OriginalId         = original.Id.ToString(),
                 Success            = result.GoodMatches / (double) result.MaxGoodMatches,
-                FTMCost            = ftmCostComputer.ComputeCost(),
-                MutationsMade = mutationCouple.Mutant.MutationsMade
+                // FTMCost            = ftmCostComputer.ComputeCost(),
+                MutationsMade = mutant.MutationsMade
                     .ToLookup(m => m.MutationType, m => m)
                     .ToDictionary(m => m.Key, m => m.Count())
             };

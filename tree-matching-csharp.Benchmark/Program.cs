@@ -12,16 +12,17 @@ namespace tree_matching_csharp.Benchmark
 {
     class Program
     {
-        public static async Task RunAndSaveMutation(string label, ITreeMatcher matcher)
+        public static async Task RunAndSaveMutation(string label, IWebsiteMatcher matcher, int? limit = null)
         {
             var repo    = await MongoRepository.InitConnection();
-            var results = Benchmark.RunMutation(label, matcher);
+            var results = Benchmark.RunMutation(label, matcher, limit);
             await foreach (var result in results)
             {
                 if (result == null)
                     continue;
                 repo.SaveResultsSimulation(result);
-                Console.WriteLine(result.ToJson());
+                // Console.WriteLine(result.ToJson());
+                // Console.WriteLine(result.Success);
             }
         }
 
@@ -52,7 +53,7 @@ namespace tree_matching_csharp.Benchmark
             var cursor = Benchmark.RunEdgeSimulation(matchers);
             await foreach (var edgeResult in cursor)
             {
-                repo.SaveResultEdgesSimulation(edgeResult);
+                // repo.SaveResultEdgesSimulation(edgeResult);
                 Console.WriteLine(edgeResult.ToJson());
             }
         }
@@ -87,25 +88,30 @@ namespace tree_matching_csharp.Benchmark
                 LabelCostFunction = RtedTreeMatcher.LabelCostFunction.String
             });
 
-            await RunAndSaveEdgesSimulation(new (string, ITreeMatcher)[] {("RTED-default", rtedDefault)});
+            // await RunAndSaveEdgesSimulation(new (string, ITreeMatcher)[] {("RTED-default", rtedDefault)});
 
             // await RunAndSaveBracket("SFTM", sftm);
             // await RunAndSaveBracket("RTED-default", rtedDefault);
 
-            // await RunAndSaveMutation("SFTM2", sftm);
+            // await RunAndSaveMutation("sftm", new WebsiteMatcher(sftm), 5);
+            // await RunAndSaveMutation("RTED-default", new WebsiteMatcher(rtedString), 5);
+            // Console.WriteLine("*************");
+            // await RunAndSaveMutation("xydiff", new XyDiffMatcher(), 5);
             
             // MUTATION
-            // var tasks = new List<Task>();
-            //
-            // Enumerable.Range(0, Settings.ThreadsRTEDDefault)
-            //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED-default", rtedDefault))); });
-            // Enumerable.Range(0, Settings.ThreadsSFTM)
-            //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("SFTM", sftm))); });
-            // Enumerable.Range(0, Settings.ThreadsRTED)
-            //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED", rtedString))); });
-            //
-            // foreach (var task in tasks)
-            //     await task;
+            var tasks = new List<Task>();
+            
+            Enumerable.Range(0, Settings.ThreadsRTEDDefault)
+                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED-default", new WebsiteMatcher(rtedDefault)))); });
+            Enumerable.Range(0, Settings.ThreadsSFTM)
+                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("SFTM", new WebsiteMatcher(sftm)))); });
+            Enumerable.Range(0, Settings.ThreadsRTED)
+                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED", new WebsiteMatcher(rtedString)))); });
+            Enumerable.Range(0, Settings.ThreadsXyDiff)
+                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("xydiff", new XyDiffMatcher()))); });
+            
+            foreach (var task in tasks)
+                await task;
         }
     }
 }

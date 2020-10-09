@@ -9,7 +9,7 @@ namespace tree_matching_csharp.Benchmark
             public const  string ConnectionString               = "mongodb://wehave_prod%40service:AX3ohnia@datalakestar.amarislab.com:27018/?authMechanism=PLAIN&appname=tree-matching-csharp.benchmark&ssl=true";
             public const  string BenchmarkDatabase              = "locatorBenchmark";
             public const  string MutationCollection             = "DOMVersions";
-            public const  string ResultCollection               = "VLDB_Mutation_SimulationResults_v2";
+            public const  string ResultCollection               = "VLDB_Mutation_SimulationResults_v3";
             public static string EdgeSimulationResultCollection = "VLDB_Mutation_EdgeSimulationResults";
         }
 
@@ -44,7 +44,7 @@ namespace tree_matching_csharp.Benchmark
         public const string UrlRTEDString  = "http://163.172.16.184:7040";
         public const string UrlRTEDDefault = "http://163.172.16.184:7041";
         
-        public const string UrlXyDiff = "http://localhost:5000/match";
+        public const string UrlXyDiff = "http://163.172.102.37:5000/match";
 
         public static readonly RtedTreeMatcher.Parameters RTEDParameters = new RtedTreeMatcher.Parameters
         {
@@ -55,6 +55,7 @@ namespace tree_matching_csharp.Benchmark
 
         public const  int MaxSizeWebsite     = 1500;
         public static int ThreadsRTED        = 2;
+        public static int ThreadsXyDiff        = 1;
         public static int ThreadsRTEDDefault = 2;
         public static int ThreadsSFTM        = 2;
     }
