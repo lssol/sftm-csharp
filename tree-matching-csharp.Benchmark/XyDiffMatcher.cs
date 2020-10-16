@@ -125,11 +125,12 @@ namespace tree_matching_csharp.Benchmark
                 .Where(signature => targetIdToSignature.Values.Contains(signature));
             
             var commonSignatures = new HashSet<string>(sourceIdToSignature.Values.Concat(targetIdToSignature.Values).Where(s => s != null));
+            var computationTime = (long) (response.time * 1000);
 
             return new WebsiteMatcher.Result
             {
                 Total                = Math.Min(sourceSignatures.Count(), targetSignatures.Count()),
-                ComputationTime      = (long) response.time * 1000,
+                ComputationTime      = computationTime,
                 GoodMatches          = goodMatches.Count(),
                 NbMismatch           = mismatch.Count(),
                 NbNoMatch            = noMatch.Count(),

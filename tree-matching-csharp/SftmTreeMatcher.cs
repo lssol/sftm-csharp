@@ -52,8 +52,8 @@ namespace tree_matching_csharp
             var index       = indexer.BuildIndex(sourceNodes);
             var indexTarget = indexer.BuildIndex(targetNodes);
 
-            AddParentToken(sourceNodes, index.GetTokenDictionary());
-            AddParentToken(targetNodes, indexTarget.GetTokenDictionary());
+            // AddParentToken(sourceNodes, index.GetTokenDictionary());
+            // AddParentToken(targetNodes, indexTarget.GetTokenDictionary());
 
             index = indexer.BuildIndex(sourceNodes);
 
