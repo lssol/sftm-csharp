@@ -20,10 +20,11 @@ namespace tree_matching_csharp.Benchmark
             {
                 if (result == null)
                     continue;
-                repo.SaveResultsSimulation(result);
+                // repo.SaveResultsSimulation(result);
                 // Console.WriteLine(result.ToJson());
-                // Console.WriteLine(result.Success);
-                // Console.WriteLine(result.ComputationTime);
+                Console.WriteLine($"*********** {label} ************");
+                Console.WriteLine(result.Success);
+                Console.WriteLine(result.ComputationTime);
             }
         }
 
@@ -102,14 +103,14 @@ namespace tree_matching_csharp.Benchmark
             // MUTATION
             var tasks = new List<Task>();
             
-            // Enumerable.Range(0, Settings.ThreadsRTEDDefault)
-                // .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED-default", new WebsiteMatcher(rtedDefault)))); });
-            // Enumerable.Range(0, Settings.ThreadsSFTM)
-            //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("SFTM", new WebsiteMatcher(sftm)))); });
+            Enumerable.Range(0, Settings.ThreadsRTEDDefault)
+                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED-default", new WebsiteMatcher(rtedDefault)))); });
+            Enumerable.Range(0, Settings.ThreadsSFTM)
+                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("SFTM", new WebsiteMatcher(sftm)))); });
             // Enumerable.Range(0, Settings.ThreadsRTED)
             //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED", new WebsiteMatcher(rtedString)))); });
             Enumerable.Range(0, Settings.ThreadsXyDiff)
-                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("xydiff2", new XyDiffMatcher()))); });
+                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("xydiff3", new XyDiffMatcher()))); });
             
             foreach (var task in tasks)
                 await task;

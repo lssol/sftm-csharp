@@ -9,7 +9,7 @@ namespace tree_matching_csharp.Benchmark
             public const  string ConnectionString               = "mongodb://wehave_prod%40service:AX3ohnia@datalakestar.amarislab.com:27018/?authMechanism=PLAIN&appname=tree-matching-csharp.benchmark&ssl=true";
             public const  string BenchmarkDatabase              = "locatorBenchmark";
             public const  string MutationCollection             = "DOMVersions";
-            public const  string ResultCollection               = "VLDB_Mutation_SimulationResults_v3";
+            public const  string ResultCollection               = "VLDB_Mutation_SimulationResults_v4";
             public static string EdgeSimulationResultCollection = "VLDB_Mutation_EdgeSimulationResults";
         }
 
@@ -53,9 +53,9 @@ namespace tree_matching_csharp.Benchmark
             RelabelCost   = 1,
         };
 
-        public const  int MaxSizeWebsite     = 1500;
+        public const  int MaxSizeWebsite     = 2500;
         public static int ThreadsRTED        = 2;
-        public static int ThreadsXyDiff        = 1;
+        public static int ThreadsXyDiff      = 1;
         public static int ThreadsRTEDDefault = 2;
         public static int ThreadsSFTM        = 2;
     }
