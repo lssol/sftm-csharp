@@ -9,16 +9,16 @@ namespace tree_matching_csharp.Benchmark
             public const  string ConnectionString               = "mongodb://wehave_prod%40service:AX3ohnia@datalakestar.amarislab.com:27018/?authMechanism=PLAIN&appname=tree-matching-csharp.benchmark&ssl=true";
             public const  string BenchmarkDatabase              = "locatorBenchmark";
             public const  string MutationCollection             = "DOMVersions";
-            public const  string ResultCollection               = "VLDB_Mutation_SimulationResults_v4";
+            public const  string ResultCollection               = "VLDB_Mutation_SimulationResults_v5";
             public static string EdgeSimulationResultCollection = "VLDB_Mutation_EdgeSimulationResults";
         }
 
         public const string SFTMLabel = "SFTM";
         public const string RTEDLabel = "RTED";
 
-        public static readonly SftmTreeMatcher.Parameters SFTMParameters = new SftmTreeMatcher.Parameters
+        public static SftmTreeMatcher.Parameters SFTMParameters() => new SftmTreeMatcher.Parameters
         {
-            LimitNeighbors = 50,
+            LimitNeighbors = 100000,
             MetropolisParameters = new Metropolis.Parameters
             {
                 Gamma                   = 1f, // MUST be < 1
@@ -42,7 +42,7 @@ namespace tree_matching_csharp.Benchmark
         };
 
         public const string UrlRTEDString  = "http://163.172.16.184:7040";
-        public const string UrlRTEDDefault = "http://163.172.16.184:7041";
+        public const string UrlRTEDDefault = "http://163.172.16.184:7043";
         
         public const string UrlXyDiff = "http://163.172.102.37:5000/match";
 

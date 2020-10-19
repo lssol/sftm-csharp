@@ -20,11 +20,12 @@ namespace tree_matching_csharp.Benchmark
             {
                 if (result == null)
                     continue;
-                // repo.SaveResultsSimulation(result);
+                repo.SaveResultsSimulation(result);
                 // Console.WriteLine(result.ToJson());
                 Console.WriteLine($"*********** {label} ************");
-                Console.WriteLine(result.Success);
-                Console.WriteLine(result.ComputationTime);
+                Console.WriteLine($"Good Match: {result.GoodMatches}");
+                Console.WriteLine($"Success: {result.Success}");
+                Console.WriteLine($"Time: {result.ComputationTime}");
             }
         }
 
@@ -74,7 +75,15 @@ namespace tree_matching_csharp.Benchmark
 
         static async Task Main(string[] args)
         {
-            var sftm        = new SftmTreeMatcher(Settings.SFTMParameters);
+            var sftm        = new SftmTreeMatcher(Settings.SFTMParameters());
+            var alphas = new List<double>{0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45,
+                0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85};
+            var sftms = alphas.Select(alpha =>
+            {
+                var p = Settings.SFTMParameters();
+                p.MaxTokenAppearance = i => (int) Math.Round(Math.Pow(i, alpha));
+                return (new SftmTreeMatcher(p), $"sftm_alpha_{alpha}");
+            });
             var rtedDefault = new RtedTreeMatcher(new RtedTreeMatcher.Parameters
             {
                 DeletionCost = Settings.RTEDParameters.DeletionCost,
@@ -103,14 +112,20 @@ namespace tree_matching_csharp.Benchmark
             // MUTATION
             var tasks = new List<Task>();
             
-            Enumerable.Range(0, Settings.ThreadsRTEDDefault)
-                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED-default", new WebsiteMatcher(rtedDefault)))); });
-            Enumerable.Range(0, Settings.ThreadsSFTM)
-                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("SFTM", new WebsiteMatcher(sftm)))); });
             // Enumerable.Range(0, Settings.ThreadsRTED)
             //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED", new WebsiteMatcher(rtedString)))); });
-            Enumerable.Range(0, Settings.ThreadsXyDiff)
-                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("xydiff3", new XyDiffMatcher()))); });
+            // Enumerable.Range(0, Settings.ThreadsRTEDDefault)
+            //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED-default", new WebsiteMatcher(rtedDefault)))); });
+            // Enumerable.Range(0, Settings.ThreadsSFTM)
+            //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("SFTM", new WebsiteMatcher(sftm)))); });
+            // Enumerable.Range(0, Settings.ThreadsXyDiff)
+            //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("xydiff3", new XyDiffMatcher()))); });
+
+            sftms.ForEach(tuple =>
+            {
+                var (s, label) = tuple;
+                tasks.Add(Task.Run(() => RunAndSaveMutation(label, new WebsiteMatcher(s))));
+            });
             
             foreach (var task in tasks)
                 await task;

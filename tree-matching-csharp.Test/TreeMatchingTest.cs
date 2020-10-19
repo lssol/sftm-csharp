@@ -15,9 +15,9 @@ namespace tree_matching_csharp.Test
             LimitNeighbors = 100,
             MetropolisParameters = new Metropolis.Parameters
             {
-                Gamma        = 1f,
+                Gamma        = 0.9f,
                 Lambda       = 0.7f,
-                NbIterations = 1,
+                NbIterations = 10,
             },
             NoMatchCost                    = 1.2,
             MaxPenalizationChildren        = 0.4,

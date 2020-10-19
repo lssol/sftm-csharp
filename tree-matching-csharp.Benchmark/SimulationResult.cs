@@ -18,6 +18,7 @@ namespace tree_matching_csharp.Benchmark
         public int                     NoMatchUnjustified { get; set; }
         public int                     Mismatch           { get; set; }
         public int                     NbMutationsMade    { get; set; }
+        public int GoodMatches { get; set; }
         public Dictionary<string, int> MutationsMade      { get; set; }
         public FtmCost.Cost            FTMCost            { get; set; }
         public int MaxGoodMatch { get; set; }

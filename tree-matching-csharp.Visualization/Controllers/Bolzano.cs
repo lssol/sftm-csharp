@@ -23,7 +23,7 @@ namespace tree_matching_csharp.Visualization.Controllers
 
         private ITreeMatcher GetMatcher(string matcher) => matcher switch
         {
-            "sftm" => new SftmTreeMatcher(Settings.SFTMParameters),
+            "sftm" => new SftmTreeMatcher(Settings.SFTMParameters()),
             "rted" => new RtedTreeMatcher(Settings.RTEDParameters),
             _      => throw new Exception("Unknown Matcher")
         };
