@@ -34,27 +34,7 @@ namespace tree_matching_csharp.Visualization.Controllers
             var matcher = GetMatcher(matcherName);
             var (key, source, target) = BolzanoImporter.GetBolzanoTrees().Skip(index).First();
             var resultMatching = await matcher.MatchTrees(source, target);
-            var maxTotal       = Math.Max(source.Count(), target.Count());
-            var edges = resultMatching.Edges.ToList();
-            var ftmCost        = new FtmCost(edges).ComputeCost();
-            var ftmRelativeCost = (ftmCost.Ancestry + ftmCost.Relabel + ftmCost.Sibling + ftmCost.NoMatch) / maxTotal;
-            return new TreeVizResult
-            {
-                Tree1 = source.Select(n => n.ToCyto()),
-                Tree2 = target.Select(n => n.ToCyto()),
-                Matching = new Matching
-                {
-                    Time = resultMatching.ComputationTime,
-                    Cost = ftmCost,
-                    RelativeCost = ftmRelativeCost,
-                    Matches = edges.Select(edge => new Matching.Match
-                    {
-                        Id1  = edge.Source?.Id.ToString(),
-                        Id2  = edge.Target?.Id.ToString(),
-                        Cost = edge.FtmCost
-                    })
-                }
-            };
+            return await tree_matching_csharp.Visualization.Utils.Utils.ToTreeViz(resultMatching, source, target);
         }
     }
 }

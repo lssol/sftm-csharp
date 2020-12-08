@@ -16,7 +16,7 @@ namespace tree_matching_csharp
 {
     public static class DOM
     {
-        private const string AttributeName = "signature";
+        public const string AttributeName = "signature";
 
         private static IEnumerable<string> TokenizeAttributes(IAttr attr)
         {

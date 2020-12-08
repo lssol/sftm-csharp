@@ -1,0 +1,103 @@
+﻿@model MatcherViewModel
+@section header
+{
+    <style>
+        iframe {
+            width: 100%;
+            height: 700px;
+        }
+    </style>
+}
+<form enctype="multipart/form-data" method="post">
+    <dl>
+        <dt>
+            <label asp-for="@Model.Website1"></label>
+        </dt>
+        <dd>
+            <input asp-for="@Model.Website1" type="file">
+            <span asp-validation-for="@Model.Website1"></span>
+        </dd>
+        <dt>
+            <label asp-for="@Model.Website2"></label>
+        </dt>
+        <dd>
+            <input asp-for="@Model.Website2" type="file">
+            <span asp-validation-for="@Model.Website2"></span>
+        </dd>
+    </dl>
+    <input asp-page-handler="Upload" class="btn" type="submit" value="Upload" />
+</form>
+
+<div class="row">
+    <div class="col-6">
+        <iframe id="source" srcdoc="@Model.Source"></iframe>
+    </div>
+    <div class="col-6">
+        <iframe id="target" srcdoc="@Model.Target"></iframe>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+    function getIFrame(iframeId) {
+        return document.getElementById(iframeId).contentWindow.document;
+    }
+    const smallElementCalculator = (body) => {
+        const getSurface = (el) => {
+            let rect = el.getBoundingClientRect()
+            return rect.width * rect.height
+        }
+        const bodySurface = getSurface(body)
+        return el => getSurface(el) / bodySurface < 0.4
+    }
+    const highlighter = (iframe) => {
+        let prevEl = null
+        let backgroundColor = ""
+        let border = ""
+        const reset = () => {
+            if (!prevEl) return
+            prevEl.style.backgroundColor = backgroundColor;
+            prevEl.style.border = border;
+        }
+        const highlight = (signature, scroll = false) => {
+            reset()
+            const el = iframe.querySelector(`[signature="${signature}"]`);
+            if (!el) return
+            prevEl = el
+            backgroundColor = el.style.backgroundColor
+            border = el.style.border
+            el.style.backgroundColor = 'yellow';
+            el.style.border = 'solid red 2px';
+            if (scroll)
+                el.scrollIntoView({
+                    behavior: 'auto',
+                    block: 'center',
+                    inline: 'center'
+                });
+        }
+        return {
+            highlight: highlight,
+            reset: reset
+        }
+    }
+    window.onload = function () {
+        const signatureAttribute = "signature"
+        let iframeSource = getIFrame("source");
+        let iframeTarget = getIFrame("target");
+        let highlighterSource = highlighter(iframeSource)
+        let highlighterTarget = highlighter(iframeTarget)
+        const isSmall = smallElementCalculator(iframeSource.body)
+        iframeSource.querySelectorAll('*')
+        .forEach(el => {
+            if (!isSmall(el)) return
+            let signature = el.getAttribute(signatureAttribute)
+            el.addEventListener('mouseenter', () => {
+                highlighterSource.highlight(signature)
+                highlighterTarget.highlight(signature, scroll)
+                return false;
+            })
+        })
+    }
+    </script>
+}
