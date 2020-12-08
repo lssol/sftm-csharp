@@ -14,6 +14,7 @@ Run Viz:
     tags:
         - preprod3
     script:
-        - docker-compose up -d viz
+        - docker-compose down
+        - docker-compose up -d --build viz
     when: manual
 
