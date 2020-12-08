@@ -6,7 +6,7 @@ Run Benchmark:
     tags:
         - zebrain
     script:
-        - docker-compose up locator_benchmark
+        - docker-compose up -d locator_benchmark
     when: manual
     
 Run Viz:
@@ -14,6 +14,6 @@ Run Viz:
     tags:
         - preprod3
     script:
-        - docker-compose up viz
+        - docker-compose up -d viz
     when: manual
 
