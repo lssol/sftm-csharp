@@ -12,7 +12,7 @@ Run Benchmark:
 Run Viz:
     stage: run
     tags:
-        - wehave
+        - preprod3
     script:
         - docker-compose up viz
     when: manual
