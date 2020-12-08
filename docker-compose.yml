@@ -1,10 +1,12 @@
 version: '3'
 services:
   locator_benchmark:
-    context: .
-    build: tree-matching-csharp.Benchmark/Dockerfile
+    build: 
+      context: .
+      dockerfile: tree-matching-csharp.Benchmark/Dockerfile
   viz:
-    context: .
-    build: tree-matching-csharp.Visualization/Dockerfile
+    build: 
+      context: .
+      dockerfile: tree-matching-csharp.Visualization/Dockerfile
     ports:
     - "14530:4678"

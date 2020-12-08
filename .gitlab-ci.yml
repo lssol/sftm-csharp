@@ -7,10 +7,13 @@ Run Benchmark:
         - zebrain
     script:
         - docker-compose up locator_benchmark
+    when: manual
+    
 Run Viz:
     stage: run
     tags:
         - wehave
     script:
         - docker-compose up viz
+    when: manual
 
