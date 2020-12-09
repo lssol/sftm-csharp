@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp.Common;
 using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -52,6 +53,8 @@ namespace tree_matching_csharp.Visualization.Controllers
             var website2 = await FileToString(matcherViewModel.Website2);
             var webDOM1 = await DOM.WebpageToDocument(website1);
             var webDOM2 = await DOM.WebpageToDocument(website2);
+            AddBase(webDOM1, matcherViewModel.Host);
+            AddBase(webDOM2, matcherViewModel.Host);
             AddSignatures(webDOM1);
             AddSignatures(webDOM2);
             var source = DOM.DomToTree(webDOM1);
@@ -70,8 +73,8 @@ namespace tree_matching_csharp.Visualization.Controllers
             });
             var viewModel = new MatcherViewModel
             {
-                Source = webDOM1.DocumentElement.OuterHtml,
-                Target = webDOM2.DocumentElement.OuterHtml,
+                SourceDoc = webDOM1.DocumentElement.OuterHtml,
+                TargetDoc = webDOM2.DocumentElement.OuterHtml,
             };
             return View("Matcher", viewModel);
         }
@@ -79,6 +82,13 @@ namespace tree_matching_csharp.Visualization.Controllers
         private void AddSignatures(IDocument doc)
         {
             doc.All.ForEach(el => el.SetAttribute(DOM.AttributeName, Guid.NewGuid().ToString()));
+        }
+
+        private void AddBase(IDocument doc, string host)
+        {
+            var baseElement = doc.CreateElement("base");
+            baseElement.SetAttribute("href", host);
+            doc.Head.Prepend(baseElement);
         }
 
         private async Task<string> FileToString(IFormFile file)

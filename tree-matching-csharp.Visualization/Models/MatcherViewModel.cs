@@ -14,6 +14,10 @@ namespace tree_matching_csharp.Visualization.Models
         }
         public IFormFile Website1 { get; set; }
         public IFormFile Website2 { get; set; }
+        public string Host { get; set; }
+        
+        public string SourceDoc { get; set; }
+        public string TargetDoc { get; set; }
         
         public string Source { get; set; }
         public string Target { get; set; }

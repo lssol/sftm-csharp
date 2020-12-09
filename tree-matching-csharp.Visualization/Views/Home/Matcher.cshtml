@@ -4,36 +4,73 @@
     <style>
         iframe {
             width: 100%;
-            height: 700px;
+            height: 1500px;
+            border:  solid 1px #a9aaae;
+            margin-top:  15px;
+        }
+        form {
+            border: #a9aaae solid 1px;
+            padding: 10px;
+            margin:  15px;
         }
     </style>
 }
 <form enctype="multipart/form-data" method="post">
-    <dl>
-        <dt>
+    <div class="row align-items-end">
+        <div class="col-3">
+            <label asp-for="@Model.Host"></label>
+            <input class="form-control" asp-for="@Model.Host">
+        </div>
+        <div class="col-3">
             <label asp-for="@Model.Website1"></label>
-        </dt>
-        <dd>
-            <input asp-for="@Model.Website1" type="file">
-            <span asp-validation-for="@Model.Website1"></span>
-        </dd>
-        <dt>
+            <input class="form-control" asp-for="@Model.Website1" type="file">
+        </div>
+        <div class="col-3">
             <label asp-for="@Model.Website2"></label>
-        </dt>
-        <dd>
-            <input asp-for="@Model.Website2" type="file">
-            <span asp-validation-for="@Model.Website2"></span>
-        </dd>
-    </dl>
-    <input asp-page-handler="Upload" class="btn" type="submit" value="Upload" />
+            <input class="form-control" asp-for="@Model.Website2" type="file">
+        </div>
+        <div class="col-1"></div>
+        <div class="col-2">
+            <input class="form-control btn btn-outline-primary" type="submit" value="Upload"/>
+        </div>
+    </div>
+</form>
+<form enctype="multipart/form-data" method="post">
+    <div class="row align-items-end">
+        <div class="col-5">
+            <label asp-for="@Model.Source"></label>
+            <input class="form-control" asp-for="@Model.Source">
+        </div>
+        <div class="col-5">
+            <label asp-for="@Model.Target"></label>
+            <input class="form-control" asp-for="@Model.Target">
+        </div>
+        <div class="col-2">
+            <input class="form-control btn btn-outline-primary" type="submit" value="Browse"/>
+        </div>
+    </div>
 </form>
 
 <div class="row">
     <div class="col-6">
-        <iframe id="source" srcdoc="@Model.Source"></iframe>
+        @if (!string.IsNullOrWhiteSpace(Model.SourceDoc))
+        {
+            <iframe id="source" srcdoc="@(Model.SourceDoc)"></iframe>
+        }
+        else if (!string.IsNullOrEmpty(Model.Source))
+        {
+            <iframe id="source" src="@(Model.Source)"></iframe>
+        }
     </div>
     <div class="col-6">
-        <iframe id="target" srcdoc="@Model.Target"></iframe>
+        @if (!string.IsNullOrWhiteSpace(Model.TargetDoc))
+        {
+            <iframe id="target" srcdoc="@(Model.TargetDoc)"></iframe>
+        }
+        else if (!string.IsNullOrEmpty(Model.Target))
+        {
+            <iframe id="target" src="@(Model.Target)"></iframe>
+        }
     </div>
 </div>
 
@@ -71,9 +108,9 @@
             el.style.border = 'solid red 2px';
             if (scroll)
                 el.scrollIntoView({
-                    behavior: 'auto',
+                    behavior: 'smooth',
                     block: 'center',
-                    inline: 'center'
+                    // inline: 'center'
                 });
         }
         return {

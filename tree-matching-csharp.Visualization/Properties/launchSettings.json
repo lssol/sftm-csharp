@@ -17,7 +17,7 @@
     },
     "tree_matching_csharp.Visualization": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "applicationUrl": "http://localhost:4678",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
