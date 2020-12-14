@@ -21,7 +21,7 @@ Run Viz PreProd:
 Run Viz Prod:
     stage: run
     tags:
-        - marketanalyis
+        - labstore2
     script:
         - docker-compose down
         - docker-compose up -d --build viz
