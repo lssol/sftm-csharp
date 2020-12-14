@@ -9,10 +9,19 @@ Run Benchmark:
         - docker-compose up -d locator_benchmark
     when: manual
     
-Run Viz:
+Run Viz PreProd:
     stage: run
     tags:
         - preprod3
+    script:
+        - docker-compose down
+        - docker-compose up -d --build viz
+    when: manual
+
+Run Viz Prod:
+    stage: run
+    tags:
+        - labstore
     script:
         - docker-compose down
         - docker-compose up -d --build viz
