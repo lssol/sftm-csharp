@@ -1,5 +1,5 @@
 variables:
-    DOTNET_IMAGE: mcr.microsoft.com/dotnet/core/sdk
+    DOTNET_IMAGE: mcr.microsoft.com/dotnet/sdk
     WEB_SERVICE_NAME: wehave_api
     PUBLISH_BAGET: http://baget.amarislab.com:5000/v3/index.json
 
