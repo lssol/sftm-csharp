@@ -1,5 +1,23 @@
+variables:
+    DOTNET_IMAGE: mcr.microsoft.com/dotnet/core/sdk
+    WEB_SERVICE_NAME: wehave_api
+    PUBLISH_BAGET: http://baget.amarislab.com:5000/v3/index.json
+
 stages:
     - run
+
+Publish Tree-Matching:
+    image: $DOTNET_IMAGE
+    stage: run
+    tags:
+        - docker
+    before_script:
+        - cd tree-matching-csharp
+        - dotnet restore
+    script:
+        - dotnet pack tree-matching-csharp.csproj -c Release -o ./nuget
+        - dotnet nuget push -s $PUBLISH_BAGET ./nuget/tree-matching-csharp.*.nupkg
+    when: manual
 
 Run Benchmark:
     stage: run
