@@ -50,12 +50,12 @@ namespace tree_matching_csharp
 
             var indexer     = new InMemoryIndexer(_param.LimitNeighbors, _param.MaxTokenAppearance(sourceNodes.Count()));
             var index       = indexer.BuildIndex(sourceNodes);
-            var indexTarget = indexer.BuildIndex(targetNodes);
+            // var indexTarget = indexer.BuildIndex(targetNodes);
 
             // AddParentToken(sourceNodes, index.GetTokenDictionary());
             // AddParentToken(targetNodes, indexTarget.GetTokenDictionary());
 
-            index = indexer.BuildIndex(sourceNodes);
+            // index = indexer.BuildIndex(sourceNodes);
 
             var neighbors = indexer.FindNeighbors(index, targetNodes);
             ComputeChildrenPenalization(neighbors, sourceNodes.Concat(targetNodes));
@@ -68,10 +68,13 @@ namespace tree_matching_csharp
             var matchingEdges = metropolis.Run();
             watch.Stop();
 
+            var cost = new FtmCost(matchingEdges).ComputeCost();
+
             return Task.FromResult(new TreeMatcherResponse
             {
                 Edges           = matchingEdges,
-                ComputationTime = watch.ElapsedMilliseconds
+                ComputationTime = watch.ElapsedMilliseconds,
+                Score = cost.Total
             });
         }
 

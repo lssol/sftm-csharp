@@ -4,7 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>tree_matching_csharp</RootNamespace>
     <Nullable>annotations</Nullable>
-    <PackageVersion>1.0.1</PackageVersion>
+    <PackageVersion>1.0.2</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
