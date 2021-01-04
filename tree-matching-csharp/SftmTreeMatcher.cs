@@ -74,7 +74,7 @@ namespace tree_matching_csharp
             {
                 Edges           = matchingEdges,
                 ComputationTime = watch.ElapsedMilliseconds,
-                Score = cost.Total
+                Cost = cost.Total
             });
         }
 

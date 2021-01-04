@@ -7,7 +7,7 @@ namespace tree_matching_csharp
     public class TreeMatcherResponse
     {
         public IEnumerable<Edge> Edges { get; set; }
-        public double Score { get; set; }
+        public double Cost { get; set; }
         public long ComputationTime { get; set; }
     }
     public interface ITreeMatcher
