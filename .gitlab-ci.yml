@@ -39,7 +39,7 @@ Run Viz PreProd:
 Run Viz Prod:
     stage: run
     tags:
-        - labstore2
+        - tools2
     script:
         - docker-compose down
         - docker-compose up -d --build viz
