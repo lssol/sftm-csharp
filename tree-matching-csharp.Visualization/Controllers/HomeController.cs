@@ -109,7 +109,17 @@ namespace tree_matching_csharp.Visualization.Controllers
 
         private void AddSignatures(IDocument doc)
         {
-            doc.All.ForEach(el => el.SetAttribute(DOM.AttributeName, Guid.NewGuid().ToString()));
+            doc.All.ForEach(el =>
+            {
+                if (el.TagName.ToLower() == "header")
+                    Console.WriteLine("HEADER");
+                el.SetAttribute(DOM.AttributeName, Guid.NewGuid().ToString());
+            });
+            doc.All.ForEach(el =>
+            {
+                if (el.TagName.ToLower() == "header")
+                    Console.WriteLine("HEADER");
+            });
         }
 
         private void AddBase(IDocument doc, string host)

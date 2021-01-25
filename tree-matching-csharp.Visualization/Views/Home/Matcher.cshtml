@@ -55,13 +55,13 @@
     <div class="col-6">
         @if (!string.IsNullOrWhiteSpace(Model.SourceDoc))
         {
-            <iframe id="source" srcdoc="@(Model.SourceDoc)"></iframe>
+            <iframe id="source" srcdoc="@(Model.SourceDoc)" sandbox="allow-same-origin"></iframe>
         }
     </div>
     <div class="col-6">
         @if (!string.IsNullOrWhiteSpace(Model.TargetDoc))
         {
-            <iframe id="target" srcdoc="@(Model.TargetDoc)"></iframe>
+            <iframe id="target" srcdoc="@(Model.TargetDoc)" sandbox="allow-same-origin"></iframe>
         }
     </div>
 </div>
