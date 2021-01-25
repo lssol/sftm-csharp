@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp.Common;
@@ -44,17 +46,43 @@ namespace tree_matching_csharp.Visualization.Controllers
         {
             return View("Matcher", new MatcherViewModel());
         }
+
+        public async Task<(string, string)> GetWebsites(MatcherViewModel model)
+        {
+            if (model.Website1 != null && model.Website2 != null)
+            {
+                var website1 = await FileToString(model.Website1);
+                var website2 = await FileToString(model.Website2);
+                return (website1, website2);
+            }
+            
+            var client = new HttpClient();
+            using var response1 = await client.GetAsync(model.Source);
+            using var response2 = await client.GetAsync(model.Target);
+            using var content1 = response1.Content;
+            using var content2 = response2.Content;
+            var r1 = await content1.ReadAsStringAsync();
+            var r2 = await content2.ReadAsStringAsync();
+            return (r1, r2);
+        }
+
+        private string? GetHost(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                return null;
+            var uri = new Uri(url);
+            return uri.GetLeftPart(UriPartial.Authority);
+        }
         
         [Route("/match")]
         [HttpPost]
         public async Task<ActionResult> MatchTwoWebsites(MatcherViewModel matcherViewModel)
         {
-            var website1 = await FileToString(matcherViewModel.Website1);
-            var website2 = await FileToString(matcherViewModel.Website2);
+            var (website1, website2) = await GetWebsites(matcherViewModel);
             var webDOM1 = await DOM.WebpageToDocument(website1);
             var webDOM2 = await DOM.WebpageToDocument(website2);
-            AddBase(webDOM1, matcherViewModel.Host);
-            AddBase(webDOM2, matcherViewModel.Host);
+            AddBase(webDOM1, matcherViewModel.Host ?? GetHost(matcherViewModel.Source) ?? "");
+            AddBase(webDOM2, matcherViewModel.Host ?? GetHost(matcherViewModel.Target) ?? "");
             AddSignatures(webDOM1);
             AddSignatures(webDOM2);
             var source = DOM.DomToTree(webDOM1);

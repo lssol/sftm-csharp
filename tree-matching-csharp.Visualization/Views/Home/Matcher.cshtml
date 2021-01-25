@@ -15,41 +15,41 @@
         }
     </style>
 }
-<form enctype="multipart/form-data" method="post">
-    <div class="row align-items-end">
-        <div class="col-3">
-            <label asp-for="@Model.Host"></label>
-            <input class="form-control" asp-for="@Model.Host">
-        </div>
-        <div class="col-3">
-            <label asp-for="@Model.Website1"></label>
-            <input class="form-control" asp-for="@Model.Website1" type="file">
-        </div>
-        <div class="col-3">
-            <label asp-for="@Model.Website2"></label>
-            <input class="form-control" asp-for="@Model.Website2" type="file">
-        </div>
-        <div class="col-1"></div>
-        <div class="col-2">
-            <input class="form-control btn btn-outline-primary" type="submit" value="Upload"/>
-        </div>
-    </div>
-</form>
 @* <form enctype="multipart/form-data" method="post"> *@
 @*     <div class="row align-items-end"> *@
-@*         <div class="col-5"> *@
-@*             <label asp-for="@Model.Source"></label> *@
-@*             <input class="form-control" asp-for="@Model.Source"> *@
+@*         <div class="col-3"> *@
+@*             <label asp-for="@Model.Host"></label> *@
+@*             <input class="form-control" asp-for="@Model.Host"> *@
 @*         </div> *@
-@*         <div class="col-5"> *@
-@*             <label asp-for="@Model.Target"></label> *@
-@*             <input class="form-control" asp-for="@Model.Target"> *@
+@*         <div class="col-3"> *@
+@*             <label asp-for="@Model.Website1"></label> *@
+@*             <input class="form-control" asp-for="@Model.Website1" type="file"> *@
 @*         </div> *@
+@*         <div class="col-3"> *@
+@*             <label asp-for="@Model.Website2"></label> *@
+@*             <input class="form-control" asp-for="@Model.Website2" type="file"> *@
+@*         </div> *@
+@*         <div class="col-1"></div> *@
 @*         <div class="col-2"> *@
-@*             <input class="form-control btn btn-outline-primary" type="submit" value="Browse"/> *@
+@*             <input class="form-control btn btn-outline-primary" type="submit" value="Upload"/> *@
 @*         </div> *@
 @*     </div> *@
 @* </form> *@
+<form enctype="multipart/form-data" method="post">
+    <div class="row align-items-end">
+        <div class="col-5">
+            <label asp-for="@Model.Source"></label>
+            <input class="form-control" asp-for="@Model.Source">
+        </div>
+        <div class="col-5">
+            <label asp-for="@Model.Target"></label>
+            <input class="form-control" asp-for="@Model.Target">
+        </div>
+        <div class="col-2">
+            <input class="form-control btn btn-outline-primary" type="submit" value="Browse"/>
+        </div>
+    </div>
+</form>
 
 <div class="row">
     <div class="col-6">
