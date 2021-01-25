@@ -57,19 +57,11 @@
         {
             <iframe id="source" srcdoc="@(Model.SourceDoc)"></iframe>
         }
-        else if (!string.IsNullOrEmpty(Model.Source))
-        {
-            <iframe id="source" src="@(Model.Source)"></iframe>
-        }
     </div>
     <div class="col-6">
         @if (!string.IsNullOrWhiteSpace(Model.TargetDoc))
         {
             <iframe id="target" srcdoc="@(Model.TargetDoc)"></iframe>
-        }
-        else if (!string.IsNullOrEmpty(Model.Target))
-        {
-            <iframe id="target" src="@(Model.Target)"></iframe>
         }
     </div>
 </div>
