@@ -21,6 +21,7 @@ namespace tree_matching_csharp.Visualization.Models
 
         public string Source { get; set; } = "https://www.goodreads.com/book/show/7144.Crime_and_Punishment?ac=1&from_search=true&qid=rlXLotJMLj&rank=1";
 
+        public long MillisecondsToMatch { get; set; }
         public string Target { get; set; } = "https://www.goodreads.com/book/show/15823480-anna-karenina?ac=1&from_search=true&qid=hRSbRPjyYB&rank=1";
         public IEnumerable<Match> Matching { get; set; }
     }

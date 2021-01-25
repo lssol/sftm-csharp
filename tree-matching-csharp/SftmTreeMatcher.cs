@@ -63,9 +63,12 @@ namespace tree_matching_csharp
 
             var noMatchEdges = GetNoMatchEdges(sourceNodes, targetNodes);
             var edges        = neighbors.ToEdges().Concat(noMatchEdges);
+            var w2 = new Stopwatch();
+            w2.Start();
             var metropolis   = new Metropolis(_param.MetropolisParameters, edges, sourceNodes.Count() + targetNodes.Count(), _param.LimitNeighbors);
 
             var matchingEdges = metropolis.Run();
+            w2.Stop();
             watch.Stop();
 
             var cost = new FtmCost(matchingEdges).ComputeCost();

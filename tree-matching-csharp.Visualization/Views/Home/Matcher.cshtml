@@ -52,6 +52,10 @@
 </form>
 
 <div class="row">
+    <p>The matching took: @(Model.MillisecondsToMatch)ms</p>
+</div>
+
+<div class="row">
     <div class="col-6">
         @if (!string.IsNullOrWhiteSpace(Model.SourceDoc))
         {

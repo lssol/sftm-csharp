@@ -90,6 +90,7 @@ namespace tree_matching_csharp.Visualization.Controllers
             
             var matcher = new SftmTreeMatcher(Settings.SFTMParameters());
             var resultMatching = await matcher.MatchTrees(source, target);
+            
             var matches = resultMatching.Edges
                 .Where(edge => edge?.Source?.Signature != null && edge.Target?.Signature != null )
                 .Select(edge => (edge.Source.Signature, edge.Target.Signature)).ToDictionary();
@@ -99,27 +100,16 @@ namespace tree_matching_csharp.Visualization.Controllers
                 var matchingValue = matches.ContainsKey(signature) ? matches[signature] : signature;
                 el.SetAttribute(DOM.AttributeName,  matchingValue);
             });
-            var viewModel = new MatcherViewModel
-            {
-                SourceDoc = webDOM1.DocumentElement.OuterHtml,
-                TargetDoc = webDOM2.DocumentElement.OuterHtml,
-            };
-            return View("Matcher", viewModel);
+            matcherViewModel.SourceDoc = webDOM1.DocumentElement.OuterHtml;
+            matcherViewModel.TargetDoc = webDOM2.DocumentElement.OuterHtml;
+            matcherViewModel.MillisecondsToMatch = resultMatching.ComputationTime;
+            
+            return View("Matcher", matcherViewModel);
         }
 
         private void AddSignatures(IDocument doc)
         {
-            doc.All.ForEach(el =>
-            {
-                if (el.TagName.ToLower() == "header")
-                    Console.WriteLine("HEADER");
-                el.SetAttribute(DOM.AttributeName, Guid.NewGuid().ToString());
-            });
-            doc.All.ForEach(el =>
-            {
-                if (el.TagName.ToLower() == "header")
-                    Console.WriteLine("HEADER");
-            });
+            doc.All.ForEach(el => el.SetAttribute(DOM.AttributeName, Guid.NewGuid().ToString()));
         }
 
         private void AddBase(IDocument doc, string host)

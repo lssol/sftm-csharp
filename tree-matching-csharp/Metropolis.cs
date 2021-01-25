@@ -39,7 +39,7 @@ namespace tree_matching_csharp
             _adjacentEdges = new HashSet<Edge>(_maxNeighbors *2);
             _edges = edges.ToList();
             _nodeToEdges     = ComputeNodeToEdgesDic();
-            ComputeAdjacentPenalization();
+            // ComputeAdjacentPenalization();
             _edges           = _edges.OrderByDescending(edge => _params.MetropolisNormalisation ? edge.NormalizedScore : edge.Score).ToList();
             _linkedListNodes = new Dictionary<Edge, LinkedListNode<Edge>>(_edges.Count());
             _rand            = new Random();
