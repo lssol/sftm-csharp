@@ -50,12 +50,12 @@ namespace tree_matching_csharp
 
             var indexer     = new InMemoryIndexer(_param.LimitNeighbors, _param.MaxTokenAppearance(sourceNodes.Count()));
             var index       = indexer.BuildIndex(sourceNodes);
-            // var indexTarget = indexer.BuildIndex(targetNodes);
+            var indexTarget = indexer.BuildIndex(targetNodes);
 
-            // AddParentToken(sourceNodes, index.GetTokenDictionary());
-            // AddParentToken(targetNodes, indexTarget.GetTokenDictionary());
+            AddParentToken(sourceNodes, index.GetTokenDictionary());
+            AddParentToken(targetNodes, indexTarget.GetTokenDictionary());
 
-            // index = indexer.BuildIndex(sourceNodes);
+            index = indexer.BuildIndex(sourceNodes);
 
             var neighbors = indexer.FindNeighbors(index, targetNodes);
             ComputeChildrenPenalization(neighbors, sourceNodes.Concat(targetNodes));

@@ -26,7 +26,7 @@ namespace tree_matching_csharp.Benchmark
                 NbIterations            = 1,
                 MetropolisNormalisation = true
             },
-            NoMatchCost                    = 4.3,
+            NoMatchCost                    = 4.5,
             MaxPenalizationChildren        = 0.4,
             MaxPenalizationParentsChildren = 0.2,
             PropagationParameters = new SimilarityPropagation.Parameters

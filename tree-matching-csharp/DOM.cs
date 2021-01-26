@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -21,12 +22,19 @@ namespace tree_matching_csharp
         private static IEnumerable<string> TokenizeAttributes(IAttr attr)
         {
             if (attr.Name == AttributeName)
-                return new string[] {};
-            
-            var value = attr.Value.Split(" ");
-            Enumerable.Append(value, attr.Name);
-            
-            return value;
+                return new string[] { };
+
+            var tokens = new List<string> {attr.Name};
+            if (string.IsNullOrWhiteSpace(attr.Value)) return tokens;
+
+            var valueTokens = Regex.Replace(attr.Value, @"\W+", " ").Split(" ")
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .ToList();
+            tokens.Add(attr.Value);
+            if (valueTokens.Count > 1 && valueTokens.Count < 10)
+                tokens.AddRange(valueTokens);
+
+            return tokens;
         }
 
         private static List<string> TokenizeNode(IElement el)
