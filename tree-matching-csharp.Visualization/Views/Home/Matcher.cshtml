@@ -18,8 +18,9 @@
 }
 
 <div class="alert alert-dark" role="alert">
-    This application <strong>does not work on Safari</strong>.
-    It has been tested it on <em>Chrome</em> and <em>Firefox</em>.
+    This demo has been tested it on <em>Chrome</em> and <em>Firefox</em>.<br/>
+    Because of too restrictive iframe permissions, it <strong>does not work on Safari</strong>.<br/>
+    <em>Note that this is unrelated to the SFTM algorithm itself which is executed on the server.</em>
 </div>
 
 <div>
@@ -124,21 +125,20 @@
             prevEl.style.backgroundColor = backgroundColor;
             prevEl.style.border = border;
         }
-        const highlight = (signature, scroll = false) => {
+        const highlight = (signature, match = true) => {
             reset()
             const el = iframe.querySelector(`[signature="${signature}"]`);
-            if (!el) return
+            if (!el) return false
             prevEl = el
             backgroundColor = el.style.backgroundColor
             border = el.style.border
-            el.style.backgroundColor = 'yellow';
+            if (match)
+                el.style.backgroundColor = 'yellow';
+            else
+                el.style.backgroundColor = '#ff5757';
             el.style.border = 'solid red 2px';
-            // if (scroll)
-            //     el.scrollIntoView({
-            //         behavior: 'smooth',
-            //         block: 'center',
-            //         // inline: 'center'
-            //     });
+            
+            return true
         }
         return {
             highlight: highlight,
@@ -153,17 +153,18 @@
         let highlighterSource = highlighter(iframeSource)
         let highlighterTarget = highlighter(iframeTarget)
         const isSmall = smallElementCalculator(iframeSource.body)
-        const highlight = (el) => {
+        const highlight = (source, target) => el => {
             if (!isSmall(el)) return
             let signature = el.getAttribute(signatureAttribute)
             el.addEventListener('mouseenter', () => {
-                highlighterSource.highlight(signature)
-                highlighterTarget.highlight(signature)
+                let exist = target.highlight(signature)
+                source.highlight(signature, exist)
                 return false;
             })
         }
-        iframeSource.querySelectorAll('*').forEach(highlight)
-        iframeTarget.querySelectorAll('*').forEach(highlight)
+        
+        iframeSource.querySelectorAll('*').forEach(highlight(highlighterSource, highlighterTarget))
+        iframeTarget.querySelectorAll('*').forEach(highlight(highlighterTarget, highlighterSource))
     }
     </script>
 }
