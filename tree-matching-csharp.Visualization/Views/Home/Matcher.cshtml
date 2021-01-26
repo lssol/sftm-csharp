@@ -132,11 +132,14 @@
             prevEl = el
             backgroundColor = el.style.backgroundColor
             border = el.style.border
-            if (match)
+            if (match) {
                 el.style.backgroundColor = 'yellow';
-            else
+                el.style.border = 'solid yellow 2px';
+            }
+            else {
                 el.style.backgroundColor = '#ff5757';
-            el.style.border = 'solid red 2px';
+                el.style.border = 'solid #ff5757 2px';
+            }
             
             return true
         }
