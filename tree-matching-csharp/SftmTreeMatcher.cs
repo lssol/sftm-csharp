@@ -30,14 +30,14 @@ namespace tree_matching_csharp
             _param = param;
         }
 
-        public void AddParentToken(IEnumerable<Node> nodes, IDictionary<string, IList<Node>> index)
+        public void AddParentToken(IEnumerable<Node> nodes, IDictionary<ulong, IList<Node>> index)
         {
             var rarestToken = nodes.ToDictionary(n => n, n => n.Value.MinBy(token => index.GetOrDefault(token, null)?.Count ?? nodes.Count()).First());
 
             nodes.ForEach(n =>
             {
                 if (n.Parent != null && rarestToken.ContainsKey(n.Parent))
-                    n.Value.Add($"#C_{rarestToken[n.Parent]}");
+                    n.Value.Add($"#C_{rarestToken[n.Parent]}".Hash());
             });
         }
 

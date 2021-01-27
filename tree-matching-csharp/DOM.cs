@@ -9,6 +9,7 @@ using System.Xml;
 using System.Xml.Linq;
 using AngleSharp;
 using AngleSharp.Dom;
+using AngleSharp.Text;
 using HtmlAgilityPack;
 using MoreLinq.Extensions;
 using Nest;
@@ -17,29 +18,37 @@ namespace tree_matching_csharp
 {
     public static class DOM
     {
-        public const string AttributeName = "signature";
+        public const string AttributeName    = "signature";
+        public const int    MaxTokenPerValue = 8;
 
-        private static IEnumerable<string> TokenizeAttributes(IAttr attr)
+        private static IEnumerable<ulong> TokenizeValue(string value)
+        {
+            var valueTokens = Regex.Replace(value, @"\W+", " ").Split(" ")
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Select(Utils.Hash)
+                .ToList();
+            
+            var hash = value.Hash();
+            valueTokens.Add(hash);
+            return valueTokens.Count < MaxTokenPerValue ? valueTokens : new List<ulong> {hash};
+        }
+        
+        private static IEnumerable<ulong> TokenizeAttributes(IAttr attr)
         {
             if (attr.Name == AttributeName)
-                return new string[] { };
+                return new List<ulong>();
 
-            var tokens = new List<string> {attr.Name};
+            var tokens = new List<ulong> {attr.Name.Hash()};
             if (string.IsNullOrWhiteSpace(attr.Value)) return tokens;
 
-            var valueTokens = Regex.Replace(attr.Value, @"\W+", " ").Split(" ")
-                .Where(s => !string.IsNullOrWhiteSpace(s))
-                .ToList();
-            tokens.Add(attr.Value);
-            if (valueTokens.Count > 1 && valueTokens.Count < 10)
-                tokens.AddRange(valueTokens);
-
+            tokens.AddRange(TokenizeValue(attr.Value));
+            
             return tokens;
         }
 
-        private static List<string> TokenizeNode(IElement el)
+        private static List<ulong> TokenizeNode(IElement el)
         {
-            var tokens = new List<string> {el.TagName};
+            var tokens = new List<ulong> {el.TagName.Hash()};
             foreach (var attr in el.Attributes)
                 tokens.AddRange(TokenizeAttributes(attr));
 
@@ -73,7 +82,7 @@ namespace tree_matching_csharp
             {
                 var newXPath = GetNewXPath(el, parent, partialXPath);
                 var tokenizedNode = TokenizeNode(el);
-                tokenizedNode.Add(newXPath);
+                tokenizedNode.Add(newXPath.Hash());
                 var node = new Node
                 {
                     Value     = tokenizedNode,

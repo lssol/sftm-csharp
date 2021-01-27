@@ -14,7 +14,7 @@ namespace tree_matching_csharp.Visualization.Models
         public class DataClass
         {
             public string              Id     { get; set; }
-            public IEnumerable<string> Value  { get; set; }
+            public IEnumerable<ulong> Value  { get; set; }
             public string              Label  { get; set; }
             public string              Parent { get; set; }
         }

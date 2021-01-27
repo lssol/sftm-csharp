@@ -18,7 +18,7 @@ namespace tree_matching_csharp.Visualization.Utils
                 Data = new CytoElementDef.DataClass
                 {
                     Id = node.Id.ToString(),
-                    Label = string.Join(" ", node.Value.Where(token => !token.StartsWith("#"))),
+                    // Label = string.Join(" ", node.Value.Where(token => !token.StartsWith("#"))),
                     Parent = node.Parent?.Id.ToString(),
                     Value = node.Value
                 }

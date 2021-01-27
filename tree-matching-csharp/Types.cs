@@ -22,7 +22,7 @@ namespace tree_matching_csharp
         }
 
         public Guid Id;
-        public List<string> Value;
+        public List<ulong> Value;
         public string Signature;
         public Node Parent;
         public Node LeftSibling;
