@@ -4,6 +4,11 @@
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
     <add key="mantulab" value="http://baget.amarislab.com:5000/v3/index.json" />
   </packageSources>
+  
+  <config>
+    <add key="signatureValidationMode" value="accept" />
+  </config>
+
   <trustedSigners>
     <author name="Microsoft">
       <certificate fingerprint="3F9001EA83C560D712C24CF213C3D312CB3BFF51EE89435D3430BD06B5D0EECE" hashAlgorithm="SHA256" allowUntrustedRoot="false" />
