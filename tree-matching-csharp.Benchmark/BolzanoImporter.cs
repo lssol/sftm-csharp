@@ -41,7 +41,7 @@ namespace tree_matching_csharp.Benchmark
             {
                 var node = new Node
                 {
-                    Value       = parent == null ? new List<ulong> {"ROOT".Hash()} : new List<ulong> {("_" + root.Label).Hash()},
+                    Value       = parent == null ? new List<string> {"ROOT"} : new List<string> {"_" + root.Label},
                     Parent      = parent,
                     LeftSibling = leftSibling
                 };

@@ -9,21 +9,21 @@ namespace tree_matching_csharp
     {
         private readonly int _maxNeighborsPerNode;
         private readonly int _maxTokenAppearance;
-        private readonly IDictionary<ulong, IList<Node>> _index;
+        private readonly IDictionary<string, IList<Node>> _index;
         private readonly HashSet<Node> _nodes;
         private double IdfPrecomputation { get; set; }
-        private readonly HashSet<ulong> _removedTokens;
+        private readonly HashSet<string> _removedTokens;
 
         public Index(int maxNeighborsPerNode, int maxTokenAppearance)
         {
             _maxNeighborsPerNode = maxNeighborsPerNode;
             _maxTokenAppearance = maxTokenAppearance;
-            _index = new Dictionary<ulong, IList<Node>>();
+            _index = new Dictionary<string, IList<Node>>();
             _nodes = new HashSet<Node>();
-            _removedTokens = new HashSet<ulong>();
+            _removedTokens = new HashSet<string>();
         }
 
-        public void Add(ulong token, Node node)
+        public void Add(string token, Node node)
         {
             _nodes.Add(node);
             if (_removedTokens.Contains(token))
@@ -40,7 +40,7 @@ namespace tree_matching_csharp
             _index.Remove(token);
         }
 
-        public Dictionary<Node, double> QueryIndex(IEnumerable<ulong> query)
+        public Dictionary<Node, double> QueryIndex(IEnumerable<string> query)
         {
             var hits = new Dictionary<Node, double>();
             foreach (var token in query)
@@ -61,7 +61,7 @@ namespace tree_matching_csharp
             return hits;
         }
 
-        public IDictionary<ulong, IList<Node>> GetTokenDictionary() => _index;
+        public IDictionary<string, IList<Node>> GetTokenDictionary() => _index;
 
         public Index PrecomputeIdf() { 
             IdfPrecomputation = Math.Log(_nodes.Count);

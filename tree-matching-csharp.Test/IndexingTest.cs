@@ -28,8 +28,8 @@ namespace tree_matching_csharp.Test
                 "node",
                 "fox"
             };
-            var sourceNodes = sourceList.Select(s => new Node { Value = s.Split(" ").Select(Utils.Hash).ToList()}).ToArray();
-            var targetNodes = targetList.Select(s => new Node { Value = s.Split(" ").Select(Utils.Hash).ToList()}).ToArray();
+            var sourceNodes = sourceList.Select(s => new Node { Value = s.Split(" ").ToList()}).ToArray();
+            var targetNodes = targetList.Select(s => new Node { Value = s.Split(" ").ToList()}).ToArray();
             
             var indexer = new InMemoryIndexer(10, 10);
             var index = indexer.BuildIndex(sourceNodes);
