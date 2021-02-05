@@ -18,7 +18,7 @@ namespace tree_matching_csharp.Benchmark
 
         public static SftmTreeMatcher.Parameters SFTMParameters() => new SftmTreeMatcher.Parameters
         {
-            LimitNeighbors = 100,
+            LimitNeighbors = 10000,
             MetropolisParameters = new Metropolis.Parameters
             {
                 Gamma                   = 1f, // MUST be < 1
