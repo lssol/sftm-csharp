@@ -24,7 +24,7 @@ Run Benchmark:
     tags:
         - zebrain
     script:
-        - docker-compose up -d locator_benchmark
+        - docker-compose up -d --build locator_benchmark
     when: manual
     
 Run Viz PreProd:
