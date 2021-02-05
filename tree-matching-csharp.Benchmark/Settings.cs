@@ -35,7 +35,7 @@ namespace tree_matching_csharp.Benchmark
                 Parent     = 0.4,
                 Sibling    = 0.0,
                 SiblingInv = 0.0,
-                ParentInv  = 0.9,
+                ParentInv  = 0.8,
                 Children   = 0.0
             },
             MaxTokenAppearance = n => (int) Math.Sqrt(n)
@@ -57,6 +57,6 @@ namespace tree_matching_csharp.Benchmark
         public static int ThreadsRTED        = 2;
         public static int ThreadsXyDiff      = 1;
         public static int ThreadsRTEDDefault = 2;
-        public static int ThreadsSFTM        = 2;
+        public static int ThreadsSFTM        = 5;
     }
 }

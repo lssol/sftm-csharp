@@ -28,7 +28,18 @@ namespace tree_matching_csharp
 
             return self;
         }
-
+        
+        public static ulong Hash(this string read)
+        {
+            var hashedValue = 3074457345618258791ul;
+            foreach (var t in read)
+            {
+                hashedValue += t;
+                hashedValue *= 3074457345618258799ul;
+            }
+            return hashedValue;
+        }
+        
         public static LinkedList<T> RemoveIfExist<T>(this LinkedList<T> self, LinkedListNode<T> node)
         {
             if (node.List != null)

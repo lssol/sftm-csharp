@@ -18,31 +18,61 @@ namespace tree_matching_csharp
     public static class DOM
     {
         public const string AttributeName = "signature";
+        
+        public const int    MaxTokenPerValue = 8;
 
+        private static IEnumerable<string> TokenizeValue(string value)
+        {
+            var valueTokens = Regex.Replace(value, @"\W+", " ").Split(" ")
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .ToList();
+            if (!valueTokens.Any())
+                return new List<string>();
+            
+            var hash = value;
+            if (valueTokens.Count > 1)
+                valueTokens.Add(hash);
+            
+            return valueTokens.Count < MaxTokenPerValue ? valueTokens : new List<string> {hash};
+        }
         private static IEnumerable<string> TokenizeAttributes(IAttr attr)
         {
-            if (attr.Name == AttributeName)
+            if (attr.Name == AttributeName || attr.Name.StartsWith("data"))
                 return new string[] { };
 
             var tokens = new List<string> {attr.Name};
             if (string.IsNullOrWhiteSpace(attr.Value)) return tokens;
 
-            var valueTokens = Regex.Replace(attr.Value, @"\W+", " ").Split(" ")
-                .Where(s => !string.IsNullOrWhiteSpace(s))
-                .ToList();
-            tokens.Add(attr.Value);
-            if (valueTokens.Count > 1 && valueTokens.Count < 10)
-                tokens.AddRange(valueTokens);
-
+            tokens.AddRange(TokenizeValue(attr.Value).Select((v => $"{attr.Name}:{v}")));
+            
             return tokens;
         }
 
+        private static string GetOwnContent(this INode el)
+        {
+            var values = el.ChildNodes
+                .Where(n => n.NodeType == NodeType.Text)
+                .Select(n => n.NodeValue
+                    .Replace("\n", "")
+                    .Replace("\t", "")
+                    .Replace("\r", "")
+                    .ToLower()
+                    .Trim())
+                .Where(n => !string.IsNullOrWhiteSpace(n));
+
+            return string.Join(' ', values);
+        }
+        
         private static List<string> TokenizeNode(IElement el)
         {
             var tokens = new List<string> {el.TagName};
             foreach (var attr in el.Attributes)
-                tokens.AddRange(TokenizeAttributes(attr));
+                tokens.AddRange(TokenizeAttributes(attr).Select(v => $"{el.TagName}:{v}"));
 
+            var content = el.GetOwnContent();
+            var contentTokens = TokenizeValue(content).Select(v => $"{el.TagName}:content:{v}");
+            tokens.AddRange(contentTokens);
+            
             return tokens;
         }
 

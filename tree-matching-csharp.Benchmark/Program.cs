@@ -104,7 +104,7 @@ namespace tree_matching_csharp.Benchmark
             // await RunAndSaveBracket("SFTM", sftm);
             // await RunAndSaveBracket("RTED-default", rtedDefault);
 
-            // await RunAndSaveMutation("sftm", new WebsiteMatcher(sftm), 5);
+            await RunAndSaveMutation("sftm_with_content_and_prefix", new WebsiteMatcher(sftm));
             // await RunAndSaveMutation("RTED-default", new WebsiteMatcher(rtedString), 5);
             // Console.WriteLine("*************");
             // await RunAndSaveMutation("xydiff", new XyDiffMatcher(), 5);
@@ -116,19 +116,19 @@ namespace tree_matching_csharp.Benchmark
             //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED", new WebsiteMatcher(rtedString)))); });
             // Enumerable.Range(0, Settings.ThreadsRTEDDefault)
             //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED-default", new WebsiteMatcher(rtedDefault)))); });
-            // Enumerable.Range(0, Settings.ThreadsSFTM)
-            //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("SFTM", new WebsiteMatcher(sftm)))); });
+            Enumerable.Range(0, Settings.ThreadsSFTM)
+                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("sftm_with_content_and_prefix", new WebsiteMatcher(sftm)))); });
             // Enumerable.Range(0, Settings.ThreadsXyDiff)
             //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("xydiff3", new XyDiffMatcher()))); });
 
-            sftms.ForEach(tuple =>
-            {
-                var (s, label) = tuple;
-                tasks.Add(Task.Run(() => RunAndSaveMutation(label, new WebsiteMatcher(s))));
-            });
-            
-            foreach (var task in tasks)
-                await task;
+            // sftms.ForEach(tuple =>
+            // {
+            //     var (s, label) = tuple;
+            //     tasks.Add(Task.Run(() => RunAndSaveMutation(label, new WebsiteMatcher(s))));
+            // });
+            //
+            // foreach (var task in tasks)
+            //     await task;
         }
     }
 }

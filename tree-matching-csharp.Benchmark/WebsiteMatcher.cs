@@ -47,15 +47,15 @@ namespace tree_matching_csharp.Benchmark
             var commonSignatures = new HashSet<string>(sourceNodes.Select(n => n.Signature));
             var targetSignatures = new HashSet<string>(targetNodes.Select(n => n.Signature));
             commonSignatures.IntersectWith(targetSignatures);
-
-            var nbNoMatch = matching.Edges.Count(m =>
+            var edges = matching.Edges.Distinct();
+            var nbNoMatch = edges.Count(m =>
                 commonSignatures.Contains((m.Source?.Signature ?? m.Target?.Signature)!)
                 && (m.Source == null || m.Target == null)
             );
-            var nbMismatch  = matching.Edges.Count(m => m.Source != null && m.Target != null && m.Source.Signature != m.Target.Signature);
-            var goodMatches = matching.Edges.Count(m => m.Source != null && m.Target != null && m.Source.Signature == m.Target.Signature);
+            var nbMismatch = edges.Count(m => m.Source != null && m.Target != null && m.Source.Signature != m.Target.Signature);
+            var goodMatches = edges.Count(m => m.Source != null && m.Target != null && m.Source.Signature == m.Target.Signature);
 
-            var signaturesMatching = matching.Edges?.Select(m => (m.Source?.Signature, m.Target?.Signature));
+            var signaturesMatching = edges.Select(m => (m.Source?.Signature, m.Target?.Signature));
 
             return new Result
             {
