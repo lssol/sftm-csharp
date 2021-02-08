@@ -57,6 +57,6 @@ namespace tree_matching_csharp.Benchmark
         public static int ThreadsRTED        = 2;
         public static int ThreadsXyDiff      = 1;
         public static int ThreadsRTEDDefault = 2;
-        public static int ThreadsSFTM        = 5;
+        public static int ThreadsSFTM        = 1;
     }
 }
