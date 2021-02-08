@@ -117,7 +117,7 @@ namespace tree_matching_csharp.Benchmark
             // Enumerable.Range(0, Settings.ThreadsRTEDDefault)
             //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("RTED-default", new WebsiteMatcher(rtedDefault)))); });
             Enumerable.Range(0, Settings.ThreadsSFTM)
-                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("sftm_with_content_and_prefix_no_limit_n", new WebsiteMatcher(sftm)))); });
+                .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("sftm_prefix", new WebsiteMatcher(sftm)))); });
             // Enumerable.Range(0, Settings.ThreadsXyDiff)
             //     .ForEach(i => { tasks.Add(Task.Run(() => RunAndSaveMutation("xydiff3", new XyDiffMatcher()))); });
 
