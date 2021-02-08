@@ -127,8 +127,8 @@ namespace tree_matching_csharp.Benchmark
             //     tasks.Add(Task.Run(() => RunAndSaveMutation(label, new WebsiteMatcher(s))));
             // });
             //
-            // foreach (var task in tasks)
-            //     await task;
+            foreach (var task in tasks)
+                await task;
         }
     }
 }
