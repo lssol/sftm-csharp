@@ -104,7 +104,7 @@ namespace tree_matching_csharp.Benchmark
             // await RunAndSaveBracket("SFTM", sftm);
             // await RunAndSaveBracket("RTED-default", rtedDefault);
 
-            await RunAndSaveMutation("sftm_with_content_and_prefix", new WebsiteMatcher(sftm));
+            // await RunAndSaveMutation("sftm_with_content_and_prefix", new WebsiteMatcher(sftm));
             // await RunAndSaveMutation("RTED-default", new WebsiteMatcher(rtedString), 5);
             // Console.WriteLine("*************");
             // await RunAndSaveMutation("xydiff", new XyDiffMatcher(), 5);
