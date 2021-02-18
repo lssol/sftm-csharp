@@ -28,9 +28,4 @@ namespace tree_matching_csharp
         public Node LeftSibling;
         public IList<Node> Children;
     }
-
-    public class TreeMatchingOutput
-    {
-        public Dictionary<string, string> Matching { get; set; }
-    }
 }

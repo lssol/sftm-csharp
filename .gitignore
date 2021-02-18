@@ -15,7 +15,9 @@
 *.userosscache
 *.sln.docstates
 .idea
-
+.ionide
+.vscode
+tree-matching-csharp.sln.DotSettings.user
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

@@ -39,7 +39,6 @@ namespace tree_matching_csharp
             _adjacentEdges = new HashSet<Edge>(_maxNeighbors *2);
             _edges = edges.ToList();
             _nodeToEdges     = ComputeNodeToEdgesDic();
-            // ComputeAdjacentPenalization();
             _edges           = _edges.OrderByDescending(edge => _params.MetropolisNormalisation ? edge.NormalizedScore : edge.Score).ToList();
             _linkedListNodes = new Dictionary<Edge, LinkedListNode<Edge>>(_edges.Count());
             _rand            = new Random();
@@ -68,22 +67,7 @@ namespace tree_matching_csharp
                 bestMatching = currentMatching;
             }
 
-
-            // var ftmCost = new FTMCost(bestMatching).ComputeCost();
-            // Console.WriteLine($"Best Objective: {maxObjective}");
-            // Console.WriteLine($"FTM: {ftmCost.Ancestry+ftmCost.Sibling+ftmCost.Relabel+ftmCost.NoMatch}: anc {ftmCost.Ancestry}, sib: {ftmCost.Sibling}, rel: {ftmCost.Relabel}, nom: {ftmCost.NoMatch}");
             return bestMatching;
-        }
-
-
-        private void ComputeAdjacentPenalization()
-        {
-            foreach (var edge in _edges)
-            {
-                var adjacentEdges = GetAdjacentEdges(edge);
-                var sumScores     = adjacentEdges.Sum(adjacentEdge => adjacentEdge.Score) + edge.Score;
-                edge.NormalizedScore = edge.Score / sumScores;
-            }
         }
 
         private Dictionary<Node, HashSet<Edge>> ComputeNodeToEdgesDic()

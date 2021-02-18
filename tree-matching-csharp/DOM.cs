@@ -69,9 +69,10 @@ namespace tree_matching_csharp
             foreach (var attr in el.Attributes)
                 tokens.AddRange(TokenizeAttributes(attr).Select(v => $"{el.TagName}:{v}"));
 
-            var content = el.GetOwnContent();
-            var contentTokens = TokenizeValue(content).Select(v => $"{el.TagName}:content:{v}");
-            tokens.AddRange(contentTokens);
+            // TO ADD THE CONTENT
+            // var content = el.GetOwnContent();
+            // var contentTokens = TokenizeValue(content).Select(v => $"{el.TagName}:content:{v}");
+            // tokens.AddRange(contentTokens);
             
             return tokens;
         }
