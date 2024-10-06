@@ -9,6 +9,8 @@ In the case of HTML, it means tags, attributes and their values.
 If you want to understand SFTM, please read the [associated scientific paper](https://arxiv.org/abs/2004.12821).
 If you use it for academic purposes, please don't forget to cite us.
 
+For a solution in the java exosystem you can also see the [implementation in Kotlin](https://github.com/lssol/sftm_tree_matching) which is deployed as a package in the official MAVEN repository.
+
 ## Projects
 
 There are 4 projects:
