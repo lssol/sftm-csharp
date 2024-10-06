@@ -6,6 +6,9 @@ To our knowledge, SFTM is the most efficient existing algorithm to match nodes f
 SFTM makes full use of the information contained in the nodes of the trees to match. 
 In the case of HTML, it means tags, attributes and their values.
 
+If you want to understand SFTM, please read the [associated scientific paper](https://arxiv.org/abs/2004.12821).
+If you use it for academic purposes, please don't forget to cite us.
+
 ## Projects
 
 There are 4 projects:
